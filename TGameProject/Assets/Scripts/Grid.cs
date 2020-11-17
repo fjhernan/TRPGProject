@@ -12,7 +12,16 @@ public class Grid : MonoBehaviour
         index_y = y;
     }
 
+    public int GetIndexX(){
+        return index_x;
+    }
+
+    public int GetIndexY(){
+        return index_y;
+    }
+
     private void OnTriggerEnter(Collider other){
+        if(other.gameObject.name == "Player")
         Debug.Log("Index x: " + index_x + "\nIndex y: " + index_y);
     }
 }
