@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8255641924548420224}
   - component: {fileID: 3954113954630374523}
+  - component: {fileID: -3127217905147112310}
   m_Layer: 0
   m_Name: MoveTile
   m_TagString: Untagged
@@ -82,3 +83,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-3127217905147112310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7739878838641562916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e98ce882c2d9f404e9a5e55acdd24694, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

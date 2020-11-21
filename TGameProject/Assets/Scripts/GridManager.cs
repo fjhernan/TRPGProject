@@ -12,9 +12,11 @@ public class GridManager : MonoBehaviour
     private GameObject[,] arr2d;
 
     private void Start(){
-        arr2d = new GameObject[15, 10];
+        arr2d = new GameObject[19, 10];
         CreateGrid();
         GameObject.Find("Player").GetComponent<Player>().SetAllTiles(arr2d);
+        GameObject.Find("Player2").GetComponent<Player>().SetAllTiles(arr2d);
+        //GameObject.FindGameObjectWithTag("Party").GetComponent<Player>().SetAllTiles(arr2d);
     }
 
     private void CreateGrid(){
@@ -61,6 +63,6 @@ public class GridManager : MonoBehaviour
         }
         grid.transform.position = new Vector3(grid.transform.position.x - ((float)offsetX), grid.transform.position.y - ((float)offsetY), offsetZ);
         grid.GetComponent<Grid>().SetIndex(offsetX, offsetY);
-        arr2d[(int)offsetX, (int)offsetY] = grid;
+        arr2d[offsetX, offsetY] = grid;
     }
 }
