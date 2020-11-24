@@ -14,14 +14,11 @@ public class GridManager : MonoBehaviour
     private void Start(){
         arr2d = new GameObject[19, 10];
         CreateGrid();
-        GameObject.Find("Player").GetComponent<Player>().SetAllTiles(arr2d);
-        GameObject.Find("Player2").GetComponent<Player>().SetAllTiles(arr2d);
-        //GameObject.FindGameObjectWithTag("Party").GetComponent<Player>().SetAllTiles(arr2d);
+        GameObject.Find("GameManager").GetComponent<GameManager>().GridCreated(arr2d);
     }
 
     private void CreateGrid(){
         string file = string.Format(Application.dataPath + "/Resources/" + filename);
-        //using (StreamReader sr = new StreamReader(string.Format(Application.dataPath + "/Resources/" + filename)))
         using (StreamReader sr = new StreamReader(file))
         {
             string line = "";

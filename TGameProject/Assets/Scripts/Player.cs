@@ -32,7 +32,8 @@ public class Player : MonoBehaviour
     public GameObject MoveTile;
     public GameObject[,] AllTiles;
     private ArrayList HighlightTiles = new ArrayList();
-    private Dictionary<Position, bool> Occupied = new Dictionary<Position, bool>();
+    //private Dictionary<Position, bool> Occupied = new Dictionary<Position, bool>();
+    private List<Position> Occupied = new List<Position>();
     private Position starting, current;
     private int remainingMovement = 3;
     private const int movement = 4;
@@ -47,37 +48,30 @@ public class Player : MonoBehaviour
         Debug.Log("This should play twice");
     }
     
-    //Player now knows what Tiles are occupied.
-    public void FillOccupiedTiles(){
-        Position temp = new Position();
-        if(gameObject.name == "Player"){
-            int x = GameObject.Find("Player2").GetComponent<Player>().GetStartingX();
-            int y = GameObject.Find("Player2").GetComponent<Player>().GetStartingY();
-            temp.SetPosition(x, y);
-            Occupied.Add(temp, true);
-        }
-        if (gameObject.name == "Player2"){
-            int x = GameObject.Find("Player").GetComponent<Player>().GetStartingX();
-            int y = GameObject.Find("Player").GetComponent<Player>().GetStartingY();
-            temp.SetPosition(x, y);
-            Occupied.Add(temp, true);
-        }
-    }
-
+    //PlayerObject now knows what Tiles are occupied.
     public void UpdateOccupiedTiles(){
         Occupied.Clear();
         Position temp = new Position();
+        int x;
+        int y;
+        
+        x = GameObject.Find("Enemy1").GetComponent<Enemy>().GetCurrentX();
+        y = GameObject.Find("Enemy1").GetComponent<Enemy>().GetCurrentY();
+
+        temp.SetPosition(x, y);
+        Occupied.Add(temp);
+
         if (gameObject.name == "Player"){
-            int x = GameObject.Find("Player2").GetComponent<Player>().GetCurrentX();
-            int y = GameObject.Find("Player2").GetComponent<Player>().GetCurrentY();
+            x = GameObject.Find("Player2").GetComponent<Player>().GetCurrentX();
+            y = GameObject.Find("Player2").GetComponent<Player>().GetCurrentY();
             temp.SetPosition(x, y);
-            Occupied.Add(temp, true);
+            Occupied.Add(temp);
         }
         if (gameObject.name == "Player2"){
-            int x = GameObject.Find("Player").GetComponent<Player>().GetCurrentX();
-            int y = GameObject.Find("Player").GetComponent<Player>().GetCurrentY();
+            x = GameObject.Find("Player").GetComponent<Player>().GetCurrentX();
+            y = GameObject.Find("Player").GetComponent<Player>().GetCurrentY();
             temp.SetPosition(x, y);
-            Occupied.Add(temp, true);
+            Occupied.Add(temp);
         }
     }
 
@@ -103,18 +97,18 @@ public class Player : MonoBehaviour
                 int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
                 remainingMovement = movement - (compare_x + compare_y);
                 if (remainingMovement > 0) {
-                    if (current.GetPositionX() > 3){
+                    if (current.GetPositionX() > 3) {
                         int x = current.GetPositionX() - 1;
                         int y = current.GetPositionY();
                         Position p = new Position();
                         p.SetPosition(x, y);
-                        
-                        if(!(Occupied.ContainsKey(p))){
+
+                        if (!(Occupied.Contains(p))){//if(!(Occupied.ContainsKey(p))){
                             Vector3 temp = AllTiles[current.GetPositionX() - 1, current.GetPositionY()].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
                             current.UpdatePositionX(-1);
                         }
-                        else if(Occupied.ContainsKey(p) == true){
+                        else if(Occupied.Contains(p) == true){//if(Occupied.ContainsKey(p) == true){
                             if(remainingMovement > 1){
                                 if(current.GetPositionX() > 4){
                                    
@@ -140,12 +134,12 @@ public class Player : MonoBehaviour
                         Position p = new Position();
                         p.SetPosition(x, y);
 
-                        if(!(Occupied.ContainsKey(p))){
+                        if(!(Occupied.Contains(p))){//if(!(Occupied.ContainsKey(p))){
                             Vector3 temp = AllTiles[current.GetPositionX() + 1, current.GetPositionY()].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
                             current.UpdatePositionX(1);
                         }
-                        else if (Occupied.ContainsKey(p) == true){
+                        else if(Occupied.Contains(p) == true){//if (Occupied.ContainsKey(p) == true){
                             if (remainingMovement > 1){
                                 if (current.GetPositionX() < size_x - 1){
 
@@ -172,12 +166,12 @@ public class Player : MonoBehaviour
                         Position p = new Position();
                         p.SetPosition(x, y);
 
-                        if (!(Occupied.ContainsKey(p))){
+                        if (!(Occupied.Contains(p))){//(!(Occupied.ContainsKey(p))){
                             Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() - 1].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
                             current.UpdatePositionY(-1);
                         }
-                        else if (Occupied.ContainsKey(p) == true){
+                        else if (Occupied.Contains(p) == true){//(Occupied.ContainsKey(p) == true){
                             if (remainingMovement > 1){
                                 if (current.GetPositionY() > 1){
                                     Debug.Log("Current.GetPositionY() is being called");
@@ -191,31 +185,25 @@ public class Player : MonoBehaviour
                     }
                 }
             }
-            if (Input.GetKeyDown(KeyCode.DownArrow))
-            {
+            if (Input.GetKeyDown(KeyCode.DownArrow)){
                 int compare_x = Mathf.Abs(current.GetPositionX() - starting.GetPositionX());
                 int compare_y = Mathf.Abs((current.GetPositionY() + 1) - starting.GetPositionY());
                 remainingMovement = movement - (compare_x + compare_y);
-                if (remainingMovement > 0)
-                {
+                if (remainingMovement > 0){
                     if (current.GetPositionY() < size_y) {
                         int x = current.GetPositionX();
                         int y = current.GetPositionY() + 1;
                         Position p = new Position();
                         p.SetPosition(x, y);
-                        
-                        if (Occupied.ContainsKey(p) == false)
-                        {
+
+                        if (!(Occupied.Contains(p))){//(Occupied.ContainsKey(p) == false)
                             Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 1].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
                             current.UpdatePositionY(1);
                         }
-                        else if (Occupied.ContainsKey(p) == true)
-                        {
-                            if (remainingMovement > 1)
-                            {
-                                if (current.GetPositionY() < (size_y - 1))
-                                {
+                        else if (Occupied.Contains(p) == true){//(Occupied.ContainsKey(p) == true)
+                            if (remainingMovement > 1){
+                                if (current.GetPositionY() < (size_y - 1)){
                                     Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 2].GetComponent<Grid>().transform.position;
                                     transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
                                     current.UpdatePositionY(2);
@@ -241,8 +229,7 @@ public class Player : MonoBehaviour
     }
 
     //Gets the Starting Y Position value
-    public int GetStartingY()
-    {
+    public int GetStartingY(){
         return starting.GetPositionY();
     }
 
@@ -252,8 +239,7 @@ public class Player : MonoBehaviour
     }
 
     //Gets the Current Y Position value
-    public int GetCurrentY()
-    {
+    public int GetCurrentY(){
         return current.GetPositionY();
     }
 
@@ -274,13 +260,10 @@ public class Player : MonoBehaviour
 
 
     //Tile Code
-    private void CreateMovementHighlight()//Creates Movement Tiles 
-    {
+    private void CreateMovementHighlight(){//Creates Movement Tiles 
         GameObject temp;
-        for (int i = 0; i < movement; i++)
-        {
-            for (int k = 0; k < movement - i; k++)
-            {
+        for (int i = 0; i < movement; i++){
+            for (int k = 0; k < movement - i; k++){
                 temp = GameObject.Instantiate(MoveTile, AllTiles[7 + i, 4 + k].transform);
                 temp.transform.position = new Vector3(temp.transform.position.x, temp.transform.position.y, offset_z);
                 HighlightTiles.Add(temp);
@@ -289,10 +272,8 @@ public class Player : MonoBehaviour
                 HighlightTiles.Add(temp);
             }
         }
-        for (int i = (movement - 1) * -1; i < 0; i++)
-        {
-            for (int k = (movement - 1) + i; k >= 0; k--)
-            {
+        for (int i = (movement - 1) * -1; i < 0; i++){
+            for (int k = (movement - 1) + i; k >= 0; k--){
                 temp = GameObject.Instantiate(MoveTile, AllTiles[7 + i, 4 + k].transform);
                 temp.transform.position = new Vector3(temp.transform.position.x, temp.transform.position.y, offset_z);
                 HighlightTiles.Add(temp);
@@ -306,40 +287,33 @@ public class Player : MonoBehaviour
         int x = current.GetPositionX() - 7;
         int y = current.GetPositionY() - 4;
 
-        foreach (GameObject Tile in HighlightTiles)
-        {
+        foreach (GameObject Tile in HighlightTiles){
             Tile.transform.position = new Vector3(Tile.transform.position.x - x, Tile.transform.position.y - y, offset_z);
         }
-        GameObject.Find("PartyManager").GetComponent<PartyManager>().GameStart();
+
+        GameObject.Find("GameManager").GetComponent<GameManager>().Countdown();
     }
 
     //Update HighlightTiles position
-    private void UpdateMovementHighlight()
-    {
+    private void UpdateMovementHighlight(){
         int x = current.GetPositionX() - starting.GetPositionX();
         int y = current.GetPositionY() - starting.GetPositionY();
-        foreach (GameObject Tile in HighlightTiles)
-        {
+        foreach (GameObject Tile in HighlightTiles){
             Tile.transform.position = new Vector3(Tile.transform.position.x - x, Tile.transform.position.y - y, Tile.transform.position.z);
         }
     }
 
     //If player is not in control, removes tiles. Signifies that player is not being controlled.
-    public void DisableHighlight()
-    {
-        foreach (GameObject Tile in HighlightTiles)
-        {
+    public void DisableHighlight(){
+        foreach (GameObject Tile in HighlightTiles){
             Tile.SetActive(false);
         }
     }
 
     //If player is in control, displays tiles. Signifies that player is being controlled.
-    public void EnableHighlight()
-    {
-        foreach (GameObject Tile in HighlightTiles)
-        {
+    public void EnableHighlight(){
+        foreach (GameObject Tile in HighlightTiles){
             Tile.SetActive(true);
         }
     }
-
 }
