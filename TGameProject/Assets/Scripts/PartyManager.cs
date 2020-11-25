@@ -39,7 +39,7 @@ public class PartyManager : MonoBehaviour
     }
 
     public void UpdateTurn(bool value){
-        Debug.Log("UpdateTurn is called " + value);
+        //Debug.Log("UpdateTurn is called " + value);
         currentTurn = value;
         if(value == true){
             PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);

@@ -19,28 +19,27 @@ public class Player : MonoBehaviour
         public int GetPositionY(){
             return index_y;
         }
-
+        /*
         public void UpdatePositionX(int value){
             index_x += value;
         }
 
         public void UpdatePositionY(int value){
             index_y += value;
-        }
+        }*/
     };
 
-    public GameObject MoveTile;
-    public GameObject[,] AllTiles;
-    private ArrayList HighlightTiles = new ArrayList();
-    //private Dictionary<Position, bool> Occupied = new Dictionary<Position, bool>();
-    private List<Position> Occupied = new List<Position>();
-    private Position starting, current;
+    public GameObject MoveTile; //To be instantiated
+    public GameObject[,] AllTiles; //The grid tiles
+    private ArrayList HighlightTiles = new ArrayList();//Array of MoveTile
+    private List<Position> Occupied = new List<Position>();//Array that holds the positions of all occupied tiles
+    private Position starting, current; //Hold indexes
     private int remainingMovement = 3;
-    private const int movement = 4;
-    private const int size_x = 15, size_y = 9;
-    private bool start = false;
-    private bool control = false;
-    private const float offset_z = -0.5f;
+    private const int movement = 4;//Total movement. Should not be changed at all
+    private const int min_size_x = 3, size_x = 15, size_y = 9;//Max movable areas in the grid
+    private bool start = false; //Used by functions that should only work once
+    private bool control = false;//Determines if the player can be controlled
+    private const float offset_z = -0.5f;//Used when instantiating MoveTile
 
     //Player now has a reference for movement
     public void SetAllTiles(GameObject[,] grid){
@@ -79,12 +78,12 @@ public class Player : MonoBehaviour
     public void SetControlStatus(bool value){
         control = value;
         if (value == false){
+            UpdateMovementHighlight();
+            UpdatePosition();
             DisableHighlight();
         }
         else{
             EnableHighlight();
-            UpdateMovementHighlight();
-            UpdatePosition();
         }
     }
 
@@ -93,29 +92,55 @@ public class Player : MonoBehaviour
         if (control == true) {
             
             if (Input.GetKeyDown(KeyCode.RightArrow)) {
-                int compare_x = Mathf.Abs((current.GetPositionX() - 1) - starting.GetPositionX());
+                int compare_x = (current.GetPositionX() - 1) - starting.GetPositionX();
                 int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
-                remainingMovement = movement - (compare_x + compare_y);
-                if (remainingMovement > 0) {
-                    if (current.GetPositionX() > 3) {
+                remainingMovement = movement - (Mathf.Abs(compare_x) + compare_y);
+                if(compare_x > 0){
+                    remainingMovement += compare_x;
+                }
+                if (remainingMovement != 0) {
+                    if (current.GetPositionX() > min_size_x) {
                         int x = current.GetPositionX() - 1;
                         int y = current.GetPositionY();
                         Position p = new Position();
                         p.SetPosition(x, y);
 
-                        if (!(Occupied.Contains(p))){//if(!(Occupied.ContainsKey(p))){
-                            Vector3 temp = AllTiles[current.GetPositionX() - 1, current.GetPositionY()].GetComponent<Grid>().transform.position;
+                        if (!(Occupied.Contains(p))){
+                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                            current.UpdatePositionX(-1);
                         }
-                        else if(Occupied.Contains(p) == true){//if(Occupied.ContainsKey(p) == true){
+                        else if(Occupied.Contains(p) == true){
                             if(remainingMovement > 1){
-                                if(current.GetPositionX() > 4){
-                                   
-                                    Vector3 temp = AllTiles[current.GetPositionX() - 2, current.GetPositionY()].GetComponent<Grid>().transform.position;
-                                    transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                                    current.UpdatePositionX(-2);
-                                    remainingMovement--;
+                                if (current.GetPositionX() > min_size_x + 1)
+                                {
+                                    x--;
+                                    p.SetPosition(x, y);
+                                    if (!(Occupied.Contains(p))){
+                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                        transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                    }
+                                    else if (Occupied.Contains(p) == true){
+                                        if (remainingMovement > 2){
+                                            if (current.GetPositionX() > min_size_x + 2){
+                                                x--;
+                                                p.SetPosition(x, y);
+                                                if (!(Occupied.Contains(p))){
+                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                    transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                }
+                                                else if (Occupied.Contains(p) == true){
+                                                    if (current.GetPositionX() > min_size_x + 3){
+                                                        x--;
+                                                        p.SetPosition(x, y);
+                                                        if (!(Occupied.Contains(p))){
+                                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -123,30 +148,51 @@ public class Player : MonoBehaviour
                 }
             }
             if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-                int compare_x = Mathf.Abs((current.GetPositionX() + 1) - starting.GetPositionX());
+                int compare_x = (current.GetPositionX() + 1) - starting.GetPositionX();
                 int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
-                
                 remainingMovement = movement - (compare_x + compare_y);
-                if (remainingMovement > 0){
+                if (remainingMovement != 0){
                     if (current.GetPositionX() < size_x){
                         int x = current.GetPositionX() + 1;
                         int y = current.GetPositionY();
                         Position p = new Position();
                         p.SetPosition(x, y);
-
-                        if(!(Occupied.Contains(p))){//if(!(Occupied.ContainsKey(p))){
-                            Vector3 temp = AllTiles[current.GetPositionX() + 1, current.GetPositionY()].GetComponent<Grid>().transform.position;
+                        
+                        if (!(Occupied.Contains(p))) { 
+                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                            current.UpdatePositionX(1);
                         }
-                        else if(Occupied.Contains(p) == true){//if (Occupied.ContainsKey(p) == true){
-                            if (remainingMovement > 1){
-                                if (current.GetPositionX() < size_x - 1){
-
-                                    Vector3 temp = AllTiles[current.GetPositionX() + 2, current.GetPositionY()].GetComponent<Grid>().transform.position;
-                                    transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                                    current.UpdatePositionX(2);
-                                    remainingMovement--;
+                        else if(Occupied.Contains(p) == true){
+                            if(remainingMovement > 1){
+                                if (current.GetPositionX() < size_x - 1) {
+                                    x++;
+                                    p.SetPosition(x, y);
+                                    if (!(Occupied.Contains(p))){
+                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                        transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                    }
+                                    else if (Occupied.Contains(p) == true){
+                                        if (remainingMovement > 2){
+                                            if (current.GetPositionX() < size_x - 2){
+                                                x++;
+                                                p.SetPosition(x, y);
+                                                if (!(Occupied.Contains(p))){
+                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                    transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                }
+                                                else if (!(Occupied.Contains(p))){
+                                                    if (current.GetPositionX() < size_x - 3){
+                                                        x++;
+                                                        p.SetPosition(x, y);
+                                                        if (!(Occupied.Contains(p))){
+                                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -158,7 +204,11 @@ public class Player : MonoBehaviour
                 int compare_y = Mathf.Abs((current.GetPositionY() - 1) - starting.GetPositionY());
                 remainingMovement = movement - (compare_x + compare_y);
                 
-                if (remainingMovement > 0){
+                if (((current.GetPositionY() - 1) - starting.GetPositionY())  > 0){
+                    remainingMovement += compare_y;
+                }
+
+                if (remainingMovement != 0){
                     if (current.GetPositionY() > 0){
 
                         int x = current.GetPositionX();
@@ -166,19 +216,34 @@ public class Player : MonoBehaviour
                         Position p = new Position();
                         p.SetPosition(x, y);
 
-                        if (!(Occupied.Contains(p))){//(!(Occupied.ContainsKey(p))){
-                            Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() - 1].GetComponent<Grid>().transform.position;
+                        if (!(Occupied.Contains(p))){
+                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                            current.UpdatePositionY(-1);
+                            
                         }
-                        else if (Occupied.Contains(p) == true){//(Occupied.ContainsKey(p) == true){
+                        else if (Occupied.Contains(p) == true){
                             if (remainingMovement > 1){
                                 if (current.GetPositionY() > 1){
-                                    Debug.Log("Current.GetPositionY() is being called");
-                                    Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() - 2].GetComponent<Grid>().transform.position;
-                                    transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                                    current.UpdatePositionY(-2);
-                                    remainingMovement--;
+                                    //Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() - 2].GetComponent<Grid>().transform.position;
+                                    //transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                    y--;
+                                    p.SetPosition(x, y);
+                                    if (!(Occupied.Contains(p))){
+                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                        transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                    }
+                                    else if(Occupied.Contains(p) == true){
+                                        if (remainingMovement > 2) {
+                                            if (current.GetPositionY() > 2) {
+                                                y--;
+                                                p.SetPosition(x, y);
+                                                if (!(Occupied.Contains(p))){
+                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                    transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -187,28 +252,52 @@ public class Player : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.DownArrow)){
                 int compare_x = Mathf.Abs(current.GetPositionX() - starting.GetPositionX());
-                int compare_y = Mathf.Abs((current.GetPositionY() + 1) - starting.GetPositionY());
+                //int compare_x = current.GetPositionX() - starting.GetPositionX(); 
+                //int compare_y = Mathf.Abs((current.GetPositionY() + 1) - starting.GetPositionY());
+                int compare_y = (current.GetPositionY() + 1) - starting.GetPositionY(); 
                 remainingMovement = movement - (compare_x + compare_y);
-                if (remainingMovement > 0){
+                if (remainingMovement != 0){
                     if (current.GetPositionY() < size_y) {
                         int x = current.GetPositionX();
                         int y = current.GetPositionY() + 1;
                         Position p = new Position();
                         p.SetPosition(x, y);
 
-                        if (!(Occupied.Contains(p))){//(Occupied.ContainsKey(p) == false)
+                        if (!(Occupied.Contains(p))){
                             Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 1].GetComponent<Grid>().transform.position;
                             transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                            current.UpdatePositionY(1);
                         }
-                        else if (Occupied.Contains(p) == true){//(Occupied.ContainsKey(p) == true)
+                        else if (Occupied.Contains(p) == true){
                             if (remainingMovement > 1){
                                 if (current.GetPositionY() < (size_y - 1)){
-                                    Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 2].GetComponent<Grid>().transform.position;
-                                    transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                                    current.UpdatePositionY(2);
-                                    remainingMovement--;
-                                    
+                                    y++;
+                                    p.SetPosition(x, y);
+                                    if (!(Occupied.Contains(p)))
+                                    {
+                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                        transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                    }
+                                    else if (Occupied.Contains(p) == true)
+                                    {
+                                        if (remainingMovement > 2)
+                                        {
+                                            if (current.GetPositionY() < size_y - 2)
+                                            {
+                                                y++;
+                                                p.SetPosition(x, y);
+                                                if (!(Occupied.Contains(p)))
+                                                {
+                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                    transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+
+                                    //Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 2].GetComponent<Grid>().transform.position;
+                                    //transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
                                 }
                             }
                         }
@@ -291,7 +380,7 @@ public class Player : MonoBehaviour
             Tile.transform.position = new Vector3(Tile.transform.position.x - x, Tile.transform.position.y - y, offset_z);
         }
 
-        GameObject.Find("GameManager").GetComponent<GameManager>().Countdown();
+        GameObject.Find("GameManager").GetComponent<GameManager>().Countdown();//Tells the GameManager that this has finished
     }
 
     //Update HighlightTiles position
