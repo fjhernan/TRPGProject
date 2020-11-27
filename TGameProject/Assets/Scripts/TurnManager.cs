@@ -18,13 +18,11 @@ public class TurnManager : MonoBehaviour
 
     public void UpdateCurrentTurn(bool value){
         if(value == false){
-            Debug.Log("It is now enemies turn");
             pComponent.UpdateTurn(false);
             eComponent.UpdateTurn(true);
         }
         else if(value == true)
         {
-            Debug.Log("It is not Players turn");
             pComponent.UpdateTurn(true);
             eComponent.UpdateTurn(false);
         }

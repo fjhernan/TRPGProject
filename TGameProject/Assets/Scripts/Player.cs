@@ -44,7 +44,7 @@ public class Player : MonoBehaviour
     //Player now has a reference for movement
     public void SetAllTiles(GameObject[,] grid){
         AllTiles = grid;
-        Debug.Log("This should play twice");
+        //Debug.Log("This should play twice");
     }
     
     //PlayerObject now knows what Tiles are occupied.

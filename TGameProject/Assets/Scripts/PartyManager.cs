@@ -13,6 +13,7 @@ public class PartyManager : MonoBehaviour
             if (i != currentMember){
                 PartyMembers[i].GetComponent<Player>().DisableHighlight();
             }
+            GameObject.Find("GameManager").GetComponent<GameManager>().AddPlayer(PartyMembers[i]);
         }
         PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
         UpdatePlayersOccupiedTiles();

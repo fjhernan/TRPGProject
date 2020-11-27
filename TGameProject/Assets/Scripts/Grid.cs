@@ -21,7 +21,7 @@ public class Grid : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other){
-        //if(other.gameObject.name == "Player")
-        //Debug.Log("Index x: " + index_x + "\nIndex y: " + index_y);
+        if(other.gameObject.name == "Player")
+        Debug.Log("Index x: " + index_x + "\nIndex y: " + index_y);
     }
 }

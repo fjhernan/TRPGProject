@@ -5,6 +5,17 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     private int starting = 2;
+    private List<GameObject> CurrentPlayers = new List<GameObject>();
+    private List<GameObject> CurrentEnemies = new List<GameObject>();
+
+    public void AddPlayer(GameObject Player){
+        CurrentPlayers.Add(Player);
+        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().NewTargetAdded(Player);
+    }
+
+    public void AddEnemy(GameObject Enemy){
+        CurrentEnemies.Add(Enemy);
+    }
 
     //Called when the GridManager creates its grid
     public void GridCreated(GameObject[,] grid){

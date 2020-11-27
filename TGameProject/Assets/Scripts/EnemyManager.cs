@@ -10,12 +10,13 @@ public class EnemyManager : MonoBehaviour
 
     public void GameStart(){
         for(int i = 0; i < Enemies.Count; i++){
-            Debug.Log("Tiles should be occupied");
+            //Debug.Log("Tiles should be occupied");
             Enemies[i].GetComponent<Enemy>().UpdateOccupiedTiles();
         }
     }
 
     private void Update(){
+        /*
         if(currentTurn == true){
             if (Input.GetKeyDown(KeyCode.Mouse0))
             {
@@ -37,7 +38,7 @@ public class EnemyManager : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
     }
 
     public void UpdateTurn(bool value)
@@ -45,13 +46,18 @@ public class EnemyManager : MonoBehaviour
         currentTurn = value;
         if (value == true)
         {
-            Debug.Log("It should be enemies turn by now");
+            //Debug.Log("It should be enemies turn by now");
             Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(true);
-        }/*
-        else
-        {
-            Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(false);
-        }*/
+        }
+    }
+
+    public void UpdateCurrentCharacterControl(){
+        Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(false);
+        currentMember++;
+        if (currentMember >= Enemies.Count){
+            GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(true);
+            currentMember = 0;   
+        }
     }
 
     public void FillEnemyTiles(GameObject[,] arr2d){
@@ -65,5 +71,12 @@ public class EnemyManager : MonoBehaviour
         for (int i = 0; i < Enemies.Count; i++){
             Enemies[i].GetComponent<Enemy>().UpdateOccupiedTiles();
         }
+    }
+
+    public void NewTargetAdded(GameObject Player){
+        for(int i = 0; i < Enemies.Count; i++){
+            Enemies[i].GetComponent<Enemy>().AddNewTarget(Player);
+        }
+        //Debug.Log("New target added should be called twice");
     }
 }
