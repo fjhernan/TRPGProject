@@ -39,11 +39,11 @@ public class Enemy : MonoBehaviour
     public GameObject[,] AllTiles;
     private Dictionary<string, Position> AllPlayers = new Dictionary<string, Position>();
     private Position starting, current;
-    private int remainingMovement = 3;
+    //private int remainingMovement = 3;
     //private const int movement = 4;
     //private const int size_x = 15, size_y = 9;
     private bool start = false;
-    private bool control = false;
+    //private bool control = false;
     //private bool found = false;
     private Dictionary<Position, string> Occupied = new Dictionary<Position, string>();
     List<Position> Pathing = new List<Position>();
@@ -52,10 +52,8 @@ public class Enemy : MonoBehaviour
     //private const float offset_z = -0.5f;
 
     //Enemy now has a reference for movement
-    public void SetAllTiles(GameObject[,] grid)
-    {
+    public void SetAllTiles(GameObject[,] grid){
         AllTiles = grid;
-        //Debug.Log("This should play twice");
     }
 
     private void SetCurrentTarget(){
@@ -83,16 +81,17 @@ public class Enemy : MonoBehaviour
             compare_x = Mathf.Abs(x2 - starting.GetPositionX());
             compare_y = Mathf.Abs(y2 - starting.GetPositionY());
             d2 = compare_x + compare_y;
-
+            Debug.Log("Player 1 dis " + d1 + " Player 2 dis" + d2 ); 
             if (d2 > d1){
-                CurrentTarget.SetPosition(x2, y2);
+                CurrentTarget.SetPosition(x1, y1);
+                //Debug.Log("Current target is " + Occupied[CurrentTarget]);
             }
             else if(d1 > d2){
-                CurrentTarget.SetPosition(x1, y1);
+                CurrentTarget.SetPosition(x2, y2);
+                //Debug.Log("Current target is " + Occupied[CurrentTarget]);
             }
         }
-        SearchBestPath();
-        //Debug.Log("Currentx" + CurrentTarget.GetPositionX() + " Currenty " + CurrentTarget.GetPositionY());
+        //SearchBestPath();
     }
 
     public void AddNewTarget(GameObject Player){
@@ -104,9 +103,9 @@ public class Enemy : MonoBehaviour
     //Enemy now knows what Tiles are occupied.
     public void UpdateOccupiedTiles(){
         Occupied.Clear();
-        Pathing.Clear();
+        //Pathing.Clear();
 
-        Debug.Log("Pathing is empty now " + Pathing.Count);
+        //Debug.Log("Pathing is empty now " + Pathing.Count);
 
         Position temp = new Position();
         Player tPlayer = GameObject.Find("Player").GetComponent<Player>();
@@ -115,76 +114,66 @@ public class Enemy : MonoBehaviour
         int y = tPlayer.GetCurrentY();
 
         temp.SetPosition(x, y);
-        Debug.Log("Player 1 pos x " + x + " y " + y);
+        //Debug.Log("Player 1 pos x " + x + " y " + y);
         Occupied.Add(temp, "Player");
         AllPlayers[tPlayer.name] = temp;
 
         tPlayer = GameObject.Find("Player2").GetComponent<Player>();
         x = tPlayer.GetCurrentX();
         y = tPlayer.GetCurrentY();
-        Debug.Log("Player 2 pos x " + x + " y " + y);
+        //Debug.Log("Player 2 pos x " + x + " y " + y);
         temp.SetPosition(x, y);
         
         Occupied.Add(temp, "Player2");
         AllPlayers[tPlayer.name] = temp;
+        //SetCurrentTarget();
+    }
+
+    public void Movement(){
         SetCurrentTarget();
+        SearchBestPath();
+        Debug.Log("Current Target is " + Occupied[CurrentTarget]);
+        Debug.Log("Pathing is " + Pathing.Count);
+        Pathing.Clear();
+
+        UpdatePosition();
+        //remainingMovement = 3;
+        //Debug.Log("Movement");
+        GameObject.Find("EnemyManager").GetComponent<EnemyManager>().UpdateCurrentCharacterControl();
+        //Debug.Log("Enemy manager called");
     }
 
     //Calls the proper methods based on the status of the Enemy
-    public void SetControlStatus(bool value){
-        control = value;
-        remainingMovement = 3;
-        if(value == false) {  
-            UpdatePosition();
-            //remainingMovement = 3;
-        }
-    }
-
-    void Update(){
-        if (control == true) {
-            
+    /*
             Position p = new Position();
-            /*
-            Debug.Log("Pathing Stack currently has " + Pathing.Count);
-            Debug.Log("Remaining Movemnt " + remainingMovement);
-            for (int i = 0; i < Pathing.Count; i++){
-                Debug.Log("Index x " + Pathing[i].GetPositionX() + " y " + Pathing[i].GetPositionY());
-            }
-            */
-            Debug.Log("Pathing should start off at 6, then go to 2");
-            Debug.Log("Pathing has " + Pathing.Count);
+            
             while(Pathing.Count > 0){
                 p = Pathing[0];
                 Pathing.RemoveAt(0);
                 Vector3 temp = AllTiles[p.GetPositionX(), p.GetPositionY()].transform.position;
                 transform.position = new Vector3(temp.x, temp.y, -0.5f);
                 current.SetPosition(p.GetPositionX(), p.GetPositionY());
-                //Debug.Log("Index x " + p.GetPositionX() + "\nIndex y " + p.GetPositionY());
                 remainingMovement--;
                 if (remainingMovement == 0){
                     break;
-                }
-                //Debug.Log("Index y" + p.GetPositionY());
-            }/*
+               }
+            }
             if(Pathing.Count == 0)
-            {
                 remainingMovement = 0;
-            }*/
 
             if(remainingMovement == 0){
                 UpdatePosition();
                 GameObject.Find("EnemyManager").GetComponent<EnemyManager>().UpdateCurrentCharacterControl();
-            }
-        }
-    }
+    }*/
     
     private void SearchBestPath(){
+        Pathing.Clear();
         Position p = new Position();
         Position t = new Position();
         
         p.SetPosition(starting.GetPositionX(), starting.GetPositionY());
         Debug.Log("Starting x " + starting.GetPositionX() + " y " + starting.GetPositionY());
-
+        Debug.Log("Target x " + CurrentTarget.GetPositionX() + " y " + CurrentTarget.GetPositionY());
         if(CheckAdjacentTiles(p) != 0){
             return;
         }
@@ -195,27 +184,28 @@ public class Enemy : MonoBehaviour
                 //Debug.Log("Target has been found. loop broken");
                 return;
             }
+            if (CurrentTarget.GetPositionY() < p.GetPositionY())
+            {
+                Debug.Log("Up");
+                t.SetPosition(p.GetPositionX(), p.GetPositionY() - 1);
+                Pathing.Add(t);
+                p.SetPosition(t.GetPositionX(), t.GetPositionY());
+            }
             if (CurrentTarget.GetPositionY() > p.GetPositionY()){
                 //Debug.Log("Down");
                 t.SetPosition(p.GetPositionX(), p.GetPositionY() + 1);
                 Pathing.Add(t);
                 p.SetPosition(t.GetPositionX(), t.GetPositionY());
             }
-            else if (p.GetPositionX() > CurrentTarget.GetPositionX())
+            if (p.GetPositionX() > CurrentTarget.GetPositionX())
             {
-                //Debug.Log("Right");
+                Debug.Log("Right");
+                Debug.Log("Moving to space " + (p.GetPositionX() - 1) + " " + p.GetPositionY());
                 t.SetPosition(p.GetPositionX() - 1, p.GetPositionY());
                 Pathing.Add(t);
-                p.SetPosition(t.GetPositionX(), t.GetPositionY());
+                p.SetPosition(p.GetPositionX() - 1, p.GetPositionY());
             }
-            else if (CurrentTarget.GetPositionY() < p.GetPositionY())
-            {
-                //Debug.Log("Up");
-                t.SetPosition(p.GetPositionX(), p.GetPositionY() - 1);
-                Pathing.Add(t);
-                p.SetPosition(t.GetPositionX(), t.GetPositionY());
-            }
-            else if (p.GetPositionX() > CurrentTarget.GetPositionX())
+            if (p.GetPositionX() < CurrentTarget.GetPositionX())
             {
                 //Debug.Log("Left");
                 t.SetPosition(p.GetPositionX() + 1, p.GetPositionY());
@@ -300,13 +290,12 @@ public class Enemy : MonoBehaviour
         int x = other.gameObject.GetComponent<Grid>().GetIndexX();
         int y = other.gameObject.GetComponent<Grid>().GetIndexY();
 
-        current.SetPosition(x, y);
-
         transform.position = new Vector3(other.transform.position.x, other.transform.position.y, -1.0f);
         if (start == false)
         {
             starting.SetPosition(x, y);
             start = true;
+            current.SetPosition(x, y);
         }
     }
 

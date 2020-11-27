@@ -47,12 +47,11 @@ public class EnemyManager : MonoBehaviour
         if (value == true)
         {
             //Debug.Log("It should be enemies turn by now");
-            Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(true);
+            Enemies[currentMember].GetComponent<Enemy>().Movement();
         }
     }
 
     public void UpdateCurrentCharacterControl(){
-        Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(false);
         currentMember++;
         if (currentMember >= Enemies.Count){
             GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(true);

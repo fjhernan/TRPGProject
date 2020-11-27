@@ -25,7 +25,7 @@ public class PartyManager : MonoBehaviour
                 if (currentMember < PartyMembers.Count){
                     PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(false);
                     currentMember++;
-
+                    //Debug.Log("Player currently" + currentMember);
                     if(currentMember < PartyMembers.Count){
                         PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
                     }
@@ -43,6 +43,7 @@ public class PartyManager : MonoBehaviour
         //Debug.Log("UpdateTurn is called " + value);
         currentTurn = value;
         if(value == true){
+            currentMember = 0;
             PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
         }
     }
