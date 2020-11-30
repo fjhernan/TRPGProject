@@ -39,7 +39,7 @@ public class Enemy : MonoBehaviour
     public GameObject[,] AllTiles;
     private Dictionary<string, Position> AllPlayers = new Dictionary<string, Position>();
     private Position starting, current;
-    //private int remainingMovement = 3;
+    private int remainingMovement = 3;
     //private const int movement = 4;
     //private const int size_x = 15, size_y = 9;
     private bool start = false;
@@ -134,6 +134,19 @@ public class Enemy : MonoBehaviour
         SearchBestPath();
         Debug.Log("Current Target is " + Occupied[CurrentTarget]);
         Debug.Log("Pathing is " + Pathing.Count);
+        
+        for(int i = 0; i < Pathing.Count - 1; i++){
+            if(remainingMovement == 0){
+                break;
+            }
+
+            Vector3 temp = AllTiles[Pathing[i].GetPositionX(), Pathing[i].GetPositionY()].transform.position;
+            transform.position = new Vector3(temp.x, temp.y, -0.5f);
+            current.SetPosition(Pathing[i].GetPositionX(), Pathing[i].GetPositionY());
+            remainingMovement--;
+        }
+        remainingMovement = 3;
+        
         Pathing.Clear();
 
         UpdatePosition();
@@ -184,28 +197,29 @@ public class Enemy : MonoBehaviour
                 //Debug.Log("Target has been found. loop broken");
                 return;
             }
-            if (CurrentTarget.GetPositionY() < p.GetPositionY())
+            if (CurrentTarget.GetPositionY() < p.GetPositionY() && CheckAdjacentTiles(p) != 5)
             {
                 Debug.Log("Up");
                 t.SetPosition(p.GetPositionX(), p.GetPositionY() - 1);
                 Pathing.Add(t);
                 p.SetPosition(t.GetPositionX(), t.GetPositionY());
             }
-            if (CurrentTarget.GetPositionY() > p.GetPositionY()){
+            if (CurrentTarget.GetPositionY() > p.GetPositionY() && CheckAdjacentTiles(p) != 4)
+            {
                 //Debug.Log("Down");
                 t.SetPosition(p.GetPositionX(), p.GetPositionY() + 1);
                 Pathing.Add(t);
                 p.SetPosition(t.GetPositionX(), t.GetPositionY());
             }
-            if (p.GetPositionX() > CurrentTarget.GetPositionX())
+            if (p.GetPositionX() > CurrentTarget.GetPositionX() && CheckAdjacentTiles(p) != 3)
             {
-                Debug.Log("Right");
-                Debug.Log("Moving to space " + (p.GetPositionX() - 1) + " " + p.GetPositionY());
+                //Debug.Log("Right");
+                //Debug.Log("Moving to space " + (p.GetPositionX() - 1) + " " + p.GetPositionY());
                 t.SetPosition(p.GetPositionX() - 1, p.GetPositionY());
                 Pathing.Add(t);
                 p.SetPosition(p.GetPositionX() - 1, p.GetPositionY());
             }
-            if (p.GetPositionX() < CurrentTarget.GetPositionX())
+            if (p.GetPositionX() < CurrentTarget.GetPositionX() && CheckAdjacentTiles(p) != 2)
             {
                 //Debug.Log("Left");
                 t.SetPosition(p.GetPositionX() + 1, p.GetPositionY());
@@ -226,29 +240,30 @@ public class Enemy : MonoBehaviour
 
     private int CheckAdjacentTiles(Position p){
         Position temp = new Position();
-        //Checks left
-        if(Occupied.ContainsKey(p) == true){
-            return 5;
-        }
-
-        temp.SetPosition(p.GetPositionX() + 1, p.GetPositionY());
+        //Checks current tile
         if(Occupied.ContainsKey(p) == true){
             return 1;
+        }
+
+        //Checks left
+        temp.SetPosition(p.GetPositionX() + 1, p.GetPositionY());
+        if(Occupied.ContainsKey(p) == true){
+            return 2;
         }
         //Checks right
         temp.SetPosition(p.GetPositionX() - 1, p.GetPositionY());
         if(Occupied.ContainsKey(p) == true){
-            return 2;
+            return 3;
         }
         //Checks below
         temp.SetPosition(p.GetPositionX(), p.GetPositionY() + 1);
         if(Occupied.ContainsKey(p) == true){
-            return 3;
+            return 4;
         }
         //Checks above
         temp.SetPosition(p.GetPositionX(), p.GetPositionY() - 1);
         if(Occupied.ContainsKey(p) == true){
-            return 4;
+            return 5;
         }
 
         return 0;

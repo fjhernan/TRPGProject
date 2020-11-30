@@ -83,6 +83,8 @@ public class Player : MonoBehaviour
             DisableHighlight();
         }
         else{
+            UpdateMovementHighlight();
+            UpdatePosition();
             EnableHighlight();
         }
     }
