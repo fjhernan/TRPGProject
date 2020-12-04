@@ -31,6 +31,8 @@ public class Player : MonoBehaviour
 
     public GameObject MoveTile; //To be instantiated
     public GameObject[,] AllTiles; //The grid tiles
+    public GameObject UIManager;
+    public int hp, atk, def;
     private ArrayList HighlightTiles = new ArrayList();//Array of MoveTile
     private List<Position> Occupied = new List<Position>();//Array that holds the positions of all occupied tiles
     private Position starting, current; //Hold indexes
@@ -78,14 +80,17 @@ public class Player : MonoBehaviour
     public void SetControlStatus(bool value){
         control = value;
         if (value == false){
+            //Player turn ends
             UpdateMovementHighlight();
             UpdatePosition();
             DisableHighlight();
         }
         else{
+            //Player turn begins
             UpdateMovementHighlight();
             UpdatePosition();
             EnableHighlight();
+            UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
         }
     }
 
