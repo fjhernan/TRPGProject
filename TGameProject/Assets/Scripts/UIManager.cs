@@ -10,8 +10,6 @@ public class UIManager : MonoBehaviour
     public Image TurnBackground, EnterBackground, SpaceBackground, AKBackground, TabBackground, BackspaceBackground, PlayerBackground;
     private bool hidden = false, combat = false, player_turn = true, player_hidden = false;
     private const string Turn = "Turn: ";
-    private string playerName;
-    private int playerHP, playerAtk, playerDef;
 
     private void Start(){
         HideEnterKey();
@@ -21,7 +19,7 @@ public class UIManager : MonoBehaviour
 
     private void Update(){
         if (Input.GetKeyDown(KeyCode.Backspace)){
-            //Hide or Unhide DisplayEverything
+            //Hide or Unhide Display
             if (player_turn == true){
                 UpdateDisplay();
             }
@@ -106,10 +104,6 @@ public class UIManager : MonoBehaviour
     }
 
     public void PlayerInfo(string name, int hp, int atk, int def){
-        //playerName = name;
-        //playerHP = hp;
-        //playerAtk = atk;
-        //playerDef = def;
         PlayerText.text = "" + name + "\nHP: " + hp + "\nATK: " + atk + "\nDEF: " + def;
     }
 

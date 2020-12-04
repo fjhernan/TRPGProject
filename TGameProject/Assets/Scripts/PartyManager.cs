@@ -25,8 +25,9 @@ public class PartyManager : MonoBehaviour
                 if (currentMember < PartyMembers.Count){
                     PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(false);
                     currentMember++;
+                    GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
                     //Debug.Log("Player currently" + currentMember);
-                    if(currentMember < PartyMembers.Count){
+                    if (currentMember < PartyMembers.Count){
                         PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
                     }
                     else{

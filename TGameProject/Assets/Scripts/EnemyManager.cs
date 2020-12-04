@@ -55,6 +55,7 @@ public class EnemyManager : MonoBehaviour
         currentMember++;
         if (currentMember >= Enemies.Count){
             GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(true);
+            GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
             currentMember = 0;   
         }
     }

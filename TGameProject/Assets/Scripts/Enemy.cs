@@ -4,33 +4,33 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    struct Position{
+    struct Position {
         private int index_x;
         private int index_y;
 
-        public Position(int x, int y){
+        public Position(int x, int y) {
             index_x = y;
             index_y = x;
         }
 
-        public void SetPosition(int x, int y){
+        public void SetPosition(int x, int y) {
             index_x = x;
             index_y = y;
         }
 
-        public int GetPositionX(){
+        public int GetPositionX() {
             return index_x;
         }
 
-        public int GetPositionY(){
+        public int GetPositionY() {
             return index_y;
         }
 
-        public void UpdatePositionX(int value){
+        public void UpdatePositionX(int value) {
             index_x = value;
         }
 
-        public void UpdatePositionY(int value){
+        public void UpdatePositionY(int value) {
             index_y = value;
         }
     };
@@ -294,6 +294,19 @@ public class Enemy : MonoBehaviour
     public int GetCurrentY()
     {
         return current.GetPositionY();
+    }
+
+    //Gets the stats
+    public int GetHP(){
+        return hp;
+    }
+
+    public int GetAtk(){
+        return atk;
+    }
+
+    public int GetDef(){
+        return def;
     }
 
     //Gets position on the grid using a trigger method.
