@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     public GameObject[,] AllTiles; //The grid tiles
     public GameObject UIManager;
     public GameObject CombatManager;
+    public GameObject PartyManager;
     public int hp, atk, def;
     private ArrayList HighlightTiles = new ArrayList();//Array of MoveTile
     //private List<Position> Occupied = new List<Position>();//Array that holds the positions of all occupied tiles
@@ -37,6 +38,7 @@ public class Player : MonoBehaviour
     private bool start = false; //Used by functions that should only work once
     private bool control = false;//Determines if the player can be controlled
     private const float offset_z = -0.5f;//Used when instantiating MoveTile
+    private bool combatAllowed = false;
 
     //Player now has a reference for movement
     public void SetAllTiles(GameObject[,] grid){
@@ -79,13 +81,16 @@ public class Player : MonoBehaviour
             UpdateMovementHighlight();
             UpdatePosition();
             DisableHighlight();
+            combatAllowed = true;
         }
         else{
             //Player turn begins
             UpdateMovementHighlight();
             UpdatePosition();
             EnableHighlight();
+            UIManager.GetComponent<UIManager>().PlayerTurn();
             UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
+            combatAllowed = true;
         }
     }
 
@@ -103,8 +108,13 @@ public class Player : MonoBehaviour
             if (target.GetPositionX() != 0 && target.GetPositionY() != 0){
                 if (Input.GetKeyDown(KeyCode.Return)){
                     Debug.Log("Starting combat");
-                    
-                    CombatManager.GetComponent<CombatManager>().CombatBegin(gameObject.name, Occupied[target], true);                    
+                    if(combatAllowed == true)    
+                        CombatManager.GetComponent<CombatManager>().CombatBegin(gameObject.name, Occupied[target], true);
+
+                    //PartyManager.GetComponent<PartyManager>().FinishedCharacterTurn();
+                    UIManager.GetComponent<UIManager>().HideArrowKeys();
+                    UIManager.GetComponent<UIManager>().HideEnterKey();
+                    control = false;
                 }
             }
 
@@ -352,6 +362,16 @@ public class Player : MonoBehaviour
     //Updates the position of the player. Used when the player control is being switched.
     private void UpdatePosition(){
         starting.SetPosition(current.GetPositionX(), current.GetPositionY());
+    }
+
+    public void TookDamage(int NewHP){
+        hp = NewHP;
+        if(hp <= 0){
+            Debug.Log(gameObject.name + " has died.");
+        }
+        else{
+            Debug.Log(gameObject.name + " is still alive.");
+        }
     }
 
     //Gets the Starting X Position value

@@ -28,7 +28,7 @@ public class TurnManager : MonoBehaviour
         else if(value == true){
             //Player Turn Starts
             Debug.Log("It is players turn");
-            uComponent.PlayerTurn();
+            //uComponent.PlayerTurn();
             pComponent.UpdateTurn(true);
             eComponent.UpdateTurn(false);
         }

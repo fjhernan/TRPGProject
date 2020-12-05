@@ -35,14 +35,15 @@ public class Enemy : MonoBehaviour
         }
     };
 
-    public GameObject MoveTile;
     public GameObject[,] AllTiles;
+    public GameObject CombatManager;
     public int hp, atk, def;
     private Dictionary<string, Position> AllPlayers = new Dictionary<string, Position>();
     private Position starting, current;
     private int remainingMovement = 3;
     private bool start = false;
     private bool control = false;
+    //private string targetName;
     //private bool found = false;
     private Dictionary<Position, string> Occupied = new Dictionary<Position, string>();
     List<Position> Pathing = new List<Position>();
@@ -81,10 +82,14 @@ public class Enemy : MonoBehaviour
             d2 = compare_x + compare_y;
             Debug.Log("Player 1 dis " + d1 + " Player 2 dis" + d2 ); 
             if (d2 > d1){
+                //Target player 2
                 CurrentTarget.SetPosition(x1, y1);
+        //        targetName = "Player2";
                 //Debug.Log("Current target is " + Occupied[CurrentTarget]);
             }
             else if(d1 > d2){
+                //Target player 1
+      //          targetName = "Player1";
                 CurrentTarget.SetPosition(x2, y2);
                 //Debug.Log("Current target is " + Occupied[CurrentTarget]);
             }
@@ -141,17 +146,16 @@ public class Enemy : MonoBehaviour
                 if(Pathing.Count != 0)
                 {
                     Debug.Log("PathingIndex" + PathingIndex + " PathingSize " + Pathing.Count);
-                    // Vector3 temp = AllTiles[Pathing[PathingIndex].GetPositionX(), Pathing[PathingIndex].GetPositionY()].transform.position;
                     Vector3 temp = AllTiles[Pathing[0].GetPositionX(), Pathing[0].GetPositionY()].transform.position;
                     temp = new Vector3(temp.x, temp.y, -1.0f);
                     if (transform.position != temp)
                     {
-                        Debug.Log("Moving to Position");
+                        //Debug.Log("Moving to Position");
                         transform.position = Vector3.MoveTowards(transform.position, temp, 0.5f * Time.deltaTime);
                     }
                     else if (transform.position == temp)
                     {
-                        Debug.Log("Position reached");
+                        //Debug.Log("Position reached");
                         current.SetPosition(Pathing[PathingIndex].GetPositionX(), Pathing[PathingIndex].GetPositionY());
                         remainingMovement--;
                         //PathingIndex++;
@@ -161,9 +165,14 @@ public class Enemy : MonoBehaviour
                 else if(Pathing.Count == 0){
                     if (control == true)
                     {
-                        Debug.Log("Does the turn end? Yes");
+                        //Reached the end of the array. Target found.
                         remainingMovement = 3;
-                        //PathingIndex = 0;
+                        if (Occupied.ContainsKey(CurrentTarget)){
+                            Debug.Log("Reached Target. Initiating Combat");
+                            CombatManager.GetComponent<CombatManager>().CombatBegin(Occupied[CurrentTarget], gameObject.name, false);
+                            Debug.Log("Combat has finished");
+                        }
+
                         UpdatePosition();
                         Pathing.Clear();
                         control = false;
@@ -174,9 +183,14 @@ public class Enemy : MonoBehaviour
             else{
                 if (control == true)
                 {
+                    if(Pathing.Count == 0){
+                        //Debug.Log("Target found");
+                        Debug.Log("Reached Target. Initiating Combat");
+                        CombatManager.GetComponent<CombatManager>().CombatBegin(Occupied[CurrentTarget], gameObject.name, false);
+                        Debug.Log("Combat has finished");
+                    }
                     Debug.Log("Does the turn end? Yes");
                     remainingMovement = 3;
-                    //PathingIndex = 0;
                     UpdatePosition();
                     Pathing.Clear();
                     control = false;
@@ -270,6 +284,16 @@ public class Enemy : MonoBehaviour
     private void UpdatePosition()
     {
         starting.SetPosition(current.GetPositionX(), current.GetPositionY());
+    }
+
+    public void TookDamage(int NewHP){
+        hp = NewHP;
+        if (hp <= 0){
+            Debug.Log(gameObject.name + " has died.");
+        }
+        else{
+            Debug.Log(gameObject.name + " is still alive.");
+        }
     }
 
     //Gets the Starting X Position value

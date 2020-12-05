@@ -73,6 +73,11 @@ public class UIManager : MonoBehaviour
         combat = true;
     }
 
+    public void HideArrowKeys(){
+        ArrowKeys.enabled = false;
+        AKBackground.enabled = false;
+    }
+
     //Hide proper displays when its enemy's turn.
     public void EnemyTurn(){
         Debug.Log("EnemyTurn called");

@@ -39,13 +39,14 @@ public class CombatManager : MonoBehaviour
                 Debug.Log("Enemy Attacks!");
                 int damage = enemy.GetAttack() - player.GetDefense();
                 int newHp = player.GetHealth() - damage;
-                if (newHp <= 0)
-                {
+                if (newHp <= 0){
                     Debug.Log("Player has died");
+                    GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
                 }
-                else
+                else{
                     Debug.Log("Player survives");
-                
+                    GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
+                }
                 combatStart = false;
             }
             else if(whoStarted == true){
@@ -58,9 +59,14 @@ public class CombatManager : MonoBehaviour
                     Debug.Log("enemy hp " + enemy.GetHealth());
                     Debug.Log("dmg" + damage + " newHP" + newHp);
                     Debug.Log("Enemy has died");
+                    GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
                 }
                 else
+                {
                     Debug.Log("Enemy survives");
+                    GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
+                }
+
                 combatStart = false;
             }
        }

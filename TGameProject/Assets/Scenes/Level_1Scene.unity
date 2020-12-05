@@ -1655,7 +1655,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dacd6becfa688164b9cd9fc9997169a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveTile: {fileID: 0}
+  CombatManager: {fileID: 79237384}
   hp: 2
   atk: 0
   def: 0
@@ -2127,6 +2127,7 @@ MonoBehaviour:
   MoveTile: {fileID: 7739878838641562916, guid: 7b46aa4229330a647bcc48fee1c07c0c, type: 3}
   UIManager: {fileID: 207978591}
   CombatManager: {fileID: 79237384}
+  PartyManager: {fileID: 467877095}
   hp: 2
   atk: 0
   def: 0
@@ -2410,6 +2411,7 @@ MonoBehaviour:
   MoveTile: {fileID: 7739878838641562916, guid: 7b46aa4229330a647bcc48fee1c07c0c, type: 3}
   UIManager: {fileID: 207978591}
   CombatManager: {fileID: 79237384}
+  PartyManager: {fileID: 467877095}
   hp: 2
   atk: 2
   def: 0

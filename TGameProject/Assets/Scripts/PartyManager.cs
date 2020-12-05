@@ -40,6 +40,27 @@ public class PartyManager : MonoBehaviour
         }
     }
 
+    public void FinishedCharacterTurn(){
+        if (currentTurn == true){
+            if (currentMember < PartyMembers.Count){
+                Debug.Log(currentMember);
+                PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(false);
+                currentMember++;
+                Debug.Log(currentMember);
+                GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
+                    //Debug.Log("Player currently" + currentMember);
+                if (currentMember < PartyMembers.Count){
+                    PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
+                }
+                else{
+                    GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(false);
+                    currentMember = 0;
+                }
+            }
+            GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();    
+        }
+    }
+
     public void UpdateTurn(bool value){
         //Debug.Log("UpdateTurn is called " + value);
         currentTurn = value;
