@@ -53,11 +53,14 @@ public class EnemyManager : MonoBehaviour
 
     public void UpdateCurrentCharacterControl(){
         currentMember++;
-        if (currentMember >= Enemies.Count){
+        if (currentMember >= Enemies.Count)
+        {
             GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(true);
             GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
-            currentMember = 0;   
+            currentMember = 0;
         }
+        else
+            Enemies[currentMember].GetComponent<Enemy>().Movement();
     }
 
     public void FillEnemyTiles(GameObject[,] arr2d){
@@ -73,10 +76,18 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
+    public void EnemyHasDied(GameObject enemy){
+        Enemies.Remove(enemy);
+        if(Enemies.Count == 0){
+            GameObject.Find("GameManager").GetComponent<GameManager>().AllEnemiesDead();
+        }
+    }
+
+    /*
     public void NewTargetAdded(GameObject Player){
         for(int i = 0; i < Enemies.Count; i++){
             Enemies[i].GetComponent<Enemy>().AddNewTarget(Player);
         }
         //Debug.Log("New target added should be called twice");
-    }
+    }*/
 }

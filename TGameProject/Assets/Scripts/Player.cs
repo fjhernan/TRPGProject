@@ -23,6 +23,8 @@ public class Player : MonoBehaviour
 
     public GameObject MoveTile; //To be instantiated
     public GameObject[,] AllTiles; //The grid tiles
+    public List<GameObject> AllSceneEnemies = new List<GameObject>();
+    public List<GameObject> AllOtherPlayers = new List<GameObject>();
     public GameObject UIManager;
     public GameObject CombatManager;
     public GameObject PartyManager;
@@ -53,44 +55,54 @@ public class Player : MonoBehaviour
         int x;
         int y;
         
-        x = GameObject.Find("Enemy1").GetComponent<Enemy>().GetCurrentX();
-        y = GameObject.Find("Enemy1").GetComponent<Enemy>().GetCurrentY();
-
-        temp.SetPosition(x, y);
-        Occupied.Add(temp, "Enemy1");
-
-        if (gameObject.name == "Player"){
-            x = GameObject.Find("Player2").GetComponent<Player>().GetCurrentX();
-            y = GameObject.Find("Player2").GetComponent<Player>().GetCurrentY();
-            temp.SetPosition(x, y);
-            Occupied.Add(temp, "Player2");
+        //Get the position of all other players currently in the grid
+        foreach(GameObject play in AllOtherPlayers){
+            if (play.activeSelf == true)
+            {
+                x = play.GetComponent<Player>().GetCurrentX();
+                y = play.GetComponent<Player>().GetCurrentY();
+                temp.SetPosition(x, y);
+                Occupied.Add(temp, play.gameObject.name);
+            }
         }
-        if (gameObject.name == "Player2"){
-            x = GameObject.Find("Player").GetComponent<Player>().GetCurrentX();
-            y = GameObject.Find("Player").GetComponent<Player>().GetCurrentY();
-            temp.SetPosition(x, y);
-            Occupied.Add(temp, "Player");
+
+        //Get the position of all other enemies currently in the grid
+        foreach(GameObject enem in AllSceneEnemies){
+            if (enem.activeSelf == true)
+            {
+                x = enem.GetComponent<Enemy>().GetCurrentX();
+                y = enem.GetComponent<Enemy>().GetCurrentY();
+                temp.SetPosition(x, y);
+                Occupied.Add(temp, enem.gameObject.name);
+            }
         }
     }
 
     //Calls the proper methods based on the status of the player
     public void SetControlStatus(bool value){
-        control = value;
-        if (value == false){
-            //Player turn ends
-            UpdateMovementHighlight();
-            UpdatePosition();
-            DisableHighlight();
-            combatAllowed = true;
-        }
-        else{
-            //Player turn begins
-            UpdateMovementHighlight();
-            UpdatePosition();
-            EnableHighlight();
-            UIManager.GetComponent<UIManager>().PlayerTurn();
-            UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
-            combatAllowed = true;
+        if (gameObject.activeSelf == true)
+        {
+            control = value;
+            if (value == false)
+            {
+                //Player turn ends
+                Debug.Log(gameObject.name + " ends turn with " + hp + " hp left");
+                UpdateMovementHighlight();
+                UpdatePosition();
+                DisableHighlight();
+                combatAllowed = true;
+            }
+            else
+            {
+                //Player turn begins
+                UpdateMovementHighlight();
+                UpdatePosition();
+                EnableHighlight();
+                UIManager.GetComponent<UIManager>().PlayerTurn();
+                Debug.Log(gameObject.name + " has " + hp + " hp left");
+                UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
+                combatAllowed = true;
+            }
         }
     }
 
@@ -112,6 +124,7 @@ public class Player : MonoBehaviour
                         CombatManager.GetComponent<CombatManager>().CombatBegin(gameObject.name, Occupied[target], true);
 
                     //PartyManager.GetComponent<PartyManager>().FinishedCharacterTurn();
+                    UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
                     UIManager.GetComponent<UIManager>().HideArrowKeys();
                     UIManager.GetComponent<UIManager>().HideEnterKey();
                     control = false;
@@ -368,9 +381,13 @@ public class Player : MonoBehaviour
         hp = NewHP;
         if(hp <= 0){
             Debug.Log(gameObject.name + " has died.");
+            SetControlStatus(false);
+            gameObject.SetActive(false);
+            PartyManager.GetComponent<PartyManager>().PlayerHasDied(gameObject);
         }
         else{
-            Debug.Log(gameObject.name + " is still alive.");
+            hp = NewHP;
+            Debug.Log(gameObject.name + " is still alive with " + hp + " hp");
         }
     }
 

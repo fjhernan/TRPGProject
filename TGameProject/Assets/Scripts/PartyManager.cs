@@ -13,7 +13,7 @@ public class PartyManager : MonoBehaviour
             if (i != currentMember){
                 PartyMembers[i].GetComponent<Player>().DisableHighlight();
             }
-            GameObject.Find("GameManager").GetComponent<GameManager>().AddPlayer(PartyMembers[i]);
+            //GameObject.Find("GameManager").GetComponent<GameManager>().AddPlayer(PartyMembers[i]);
         }
         PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
         UpdatePlayersOccupiedTiles();
@@ -40,27 +40,6 @@ public class PartyManager : MonoBehaviour
         }
     }
 
-    public void FinishedCharacterTurn(){
-        if (currentTurn == true){
-            if (currentMember < PartyMembers.Count){
-                Debug.Log(currentMember);
-                PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(false);
-                currentMember++;
-                Debug.Log(currentMember);
-                GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
-                    //Debug.Log("Player currently" + currentMember);
-                if (currentMember < PartyMembers.Count){
-                    PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
-                }
-                else{
-                    GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(false);
-                    currentMember = 0;
-                }
-            }
-            GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();    
-        }
-    }
-
     public void UpdateTurn(bool value){
         //Debug.Log("UpdateTurn is called " + value);
         currentTurn = value;
@@ -68,6 +47,19 @@ public class PartyManager : MonoBehaviour
             currentMember = 0;
             PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
         }
+    }
+
+    public void PlayerHasDied(GameObject player){
+        PartyMembers.Remove(player);
+        Debug.Log("There is this many party members left" + PartyMembers.Count);
+        if(currentMember < PartyMembers.Count){
+            PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
+            GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
+        }
+        else{
+            GameObject.Find("GameManager").GetComponent<GameManager>().AllPlayersDead();
+        }
+        //FinishedCharacterTurn();
     }
 
     public void UpdatePlayersOccupiedTiles(){

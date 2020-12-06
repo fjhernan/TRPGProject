@@ -26,13 +26,14 @@ public class CombatManager : MonoBehaviour
         }
     }
 
-    private bool combatStart = false, whoStarted;
+    //private bool combatStart = false, whoStarted;
     private Player pComponent;
     private Enemy eComponent;
     private Stats player = new Stats(), enemy = new Stats();
 
 
     private void Update(){
+        /*
        if(combatStart == true){
             if(whoStarted == false){
                 //Enemy started combat
@@ -44,7 +45,7 @@ public class CombatManager : MonoBehaviour
                     GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
                 }
                 else{
-                    Debug.Log("Player survives");
+                    Debug.Log("Player survives with " + newHp);
                     GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
                 }
                 combatStart = false;
@@ -69,7 +70,7 @@ public class CombatManager : MonoBehaviour
 
                 combatStart = false;
             }
-       }
+       }*/
     }
 
     public void CombatBegin(string playerName, string enemyName, bool initiate){
@@ -77,7 +78,44 @@ public class CombatManager : MonoBehaviour
         eComponent = GameObject.Find(enemyName).GetComponent<Enemy>();
         player.SetStats(pComponent.GetHP(), pComponent.GetAtk(), pComponent.GetDef());
         enemy.SetStats(eComponent.GetHP(), eComponent.GetAtk(), eComponent.GetDef());
-        whoStarted = initiate;
-        combatStart = true;
+        //whoStarted = initiate;
+        //combatStart = true;
+        if(initiate == true){
+            //Player started combat
+            Debug.Log("Player Attacks!");
+            int damage = player.GetAttack() - enemy.GetDefense();
+            int newHp = enemy.GetHealth() - damage;
+            if (newHp <= 0)
+            {
+                Debug.Log("enemy hp " + enemy.GetHealth());
+                Debug.Log("dmg" + damage + " newHP" + newHp);
+                Debug.Log("Enemy has died");
+                GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
+            }
+            else
+            {
+                Debug.Log("Enemy survives");
+                GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
+            }
+        }
+        else if(initiate == false){
+            //Enemy started combat
+            Debug.Log("Enemy Attacks!");
+            int damage = enemy.GetAttack() - player.GetDefense();
+            int newHp = player.GetHealth() - damage;
+            if (newHp <= 0)
+            {
+                Debug.Log("player hp " + player.GetHealth());
+                Debug.Log("dmg" + damage + " newHP" + newHp);
+                Debug.Log("Player has died");
+                GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
+            }
+            else
+            {
+                Debug.Log("Player survives");
+                GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
+            }
+        }
+    
     }
 }

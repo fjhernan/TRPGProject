@@ -37,8 +37,10 @@ public class Enemy : MonoBehaviour
 
     public GameObject[,] AllTiles;
     public GameObject CombatManager;
+    public List<GameObject> AllOtherEnemies = new List<GameObject>();
+    public List<GameObject> AllScenePlayers = new List<GameObject>();
     public int hp, atk, def;
-    private Dictionary<string, Position> AllPlayers = new Dictionary<string, Position>();
+    //private Dictionary<Position, string> AllPlayers = new Dictionary<Position, string>();
     private Position starting, current;
     private int remainingMovement = 3;
     private bool start = false;
@@ -59,9 +61,19 @@ public class Enemy : MonoBehaviour
         List<Position> PlayerPositions = new List<Position>();
         
         foreach(KeyValuePair<Position, string> p in Occupied){
-            PlayerPositions.Add(p.Key);
+            bool found = false;
+            for(int i = 0; i < AllOtherEnemies.Count; i++){
+                if(AllOtherEnemies[i].name == Occupied[p.Key]){
+                    found = true;
+                }
+            }
+            if(found == false)
+                PlayerPositions.Add(p.Key);
+            found = false;
         }
-        
+
+        Debug.Log(PlayerPositions.Count);
+
         CurrentTarget.SetPosition(PlayerPositions[0].GetPositionX(), PlayerPositions[0].GetPositionY());
         
         int x1, y1, x2, y2, compare_x, compare_y, d1, d2;
@@ -97,19 +109,47 @@ public class Enemy : MonoBehaviour
         //SearchBestPath();
     }
 
+    /*
     public void AddNewTarget(GameObject Player){
         Position temp = new Position();
         temp.SetPosition(Player.GetComponent<Player>().GetCurrentX(), Player.GetComponent<Player>().GetCurrentY());
         AllPlayers.Add(Player.name, temp);
-    }
+    }*/
 
     //Enemy now knows what Tiles are occupied.
     public void UpdateOccupiedTiles(){
         Occupied.Clear();
+
+        Position temp = new Position();
+        int x;
+        int y;
+
+        foreach(GameObject play in AllScenePlayers){
+            if (play.activeSelf == true)
+            {
+                x = play.GetComponent<Player>().GetCurrentX();
+                y = play.GetComponent<Player>().GetCurrentY();
+                temp.SetPosition(x, y);
+                Occupied.Add(temp, play.gameObject.name);
+                //AllPlayers.Add(temp, play.gameObject.name);
+            }
+        }
+
+        foreach(GameObject enem in AllOtherEnemies)
+        {
+            if (enem.activeSelf == true)
+            {
+                x = enem.GetComponent<Enemy>().GetCurrentX();
+                y = enem.GetComponent<Enemy>().GetCurrentY();
+                temp.SetPosition(x, y);
+                Occupied.Add(temp, enem.gameObject.name);
+            }
+        }
+
         //Pathing.Clear();
 
         //Debug.Log("Pathing is empty now " + Pathing.Count);
-
+        /*
         Position temp = new Position();
         Player tPlayer = GameObject.Find("Player").GetComponent<Player>();
 
@@ -128,7 +168,7 @@ public class Enemy : MonoBehaviour
         temp.SetPosition(x, y);
         
         Occupied.Add(temp, "Player2");
-        AllPlayers[tPlayer.name] = temp;
+        AllPlayers[tPlayer.name] = temp;*/
         //SetCurrentTarget();
     }
 
@@ -188,7 +228,9 @@ public class Enemy : MonoBehaviour
                         Debug.Log("Reached Target. Initiating Combat");
                         CombatManager.GetComponent<CombatManager>().CombatBegin(Occupied[CurrentTarget], gameObject.name, false);
                         Debug.Log("Combat has finished");
+                        Debug.Log("Does the turn end? Yes");
                     }
+                        
                     Debug.Log("Does the turn end? Yes");
                     remainingMovement = 3;
                     UpdatePosition();
@@ -290,8 +332,11 @@ public class Enemy : MonoBehaviour
         hp = NewHP;
         if (hp <= 0){
             Debug.Log(gameObject.name + " has died.");
+            GameObject.Find("EnemyManager").GetComponent<EnemyManager>().EnemyHasDied(gameObject);
+            gameObject.SetActive(false);
         }
         else{
+            hp = NewHP;
             Debug.Log(gameObject.name + " is still alive.");
         }
     }
