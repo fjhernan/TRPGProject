@@ -7,6 +7,8 @@ public class EnemyManager : MonoBehaviour
     public List<GameObject> Enemies;
     private int currentMember = 0;
     private bool currentTurn = false;
+    private bool gameOver = false;
+    private bool paused = false;
 
     public void GameStart(){
         for(int i = 0; i < Enemies.Count; i++){
@@ -15,41 +17,37 @@ public class EnemyManager : MonoBehaviour
         }
     }
 
-    private void Update(){
-        /*
-        if(currentTurn == true){
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                if (currentMember < Enemies.Count)
-                {
-                    Debug.Log("Enemies size is " + Enemies.Count);
-                    Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(false);
-                    currentMember++;
-                    GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
-
-                    if (currentMember < Enemies.Count)
-                    {
-                        Enemies[currentMember].GetComponent<Enemy>().SetControlStatus(true);
-                    }
-                    else
-                    {
-                        GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(true);
-                        currentMember = 0;
-                    }
-                }
-            }
-        }*/
-    }
-
     public void UpdateTurn(bool value)
     {
-        currentTurn = value;
-        if (value == true)
+        if (gameOver == false)
         {
-            //Debug.Log("It should be enemies turn by now");
+            currentTurn = value;
+            if (value == true)
+            {
+                if (paused == false)
+                {
+                    //Debug.Log("It should be enemies turn by now");
+                    Enemies[currentMember].GetComponent<Enemy>().Movement();
+                }
+            }
+        }
+    }
+
+    public void Pause()
+    {
+        paused = true;
+    }
+
+    public void UnPause()
+    {
+        paused = false;
+        if(currentTurn == true)
+        {
             Enemies[currentMember].GetComponent<Enemy>().Movement();
         }
     }
+
+
 
     public void UpdateCurrentCharacterControl(){
         currentMember++;
@@ -58,9 +56,15 @@ public class EnemyManager : MonoBehaviour
             GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(true);
             GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
             currentMember = 0;
+            currentTurn = false;
         }
         else
-            Enemies[currentMember].GetComponent<Enemy>().Movement();
+        {
+            if (paused == false)
+            {
+                Enemies[currentMember].GetComponent<Enemy>().Movement();
+            }
+        }
     }
 
     public void FillEnemyTiles(GameObject[,] arr2d){
@@ -81,6 +85,10 @@ public class EnemyManager : MonoBehaviour
         if(Enemies.Count == 0){
             GameObject.Find("GameManager").GetComponent<GameManager>().AllEnemiesDead();
         }
+    }
+
+    public void GameOver(){
+        gameOver = true;
     }
 
     /*

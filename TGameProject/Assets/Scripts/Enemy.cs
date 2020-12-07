@@ -178,8 +178,9 @@ public class Enemy : MonoBehaviour
         SearchBestPath();
     }
 
-    private void Update(){
+    private void Update(){        
         if(control == true){
+
             if (remainingMovement > 0){
                 Debug.Log("Remaining movement is " + remainingMovement);
                 //if (PathingIndex < Pathing.Count)
@@ -240,6 +241,7 @@ public class Enemy : MonoBehaviour
                 }
             }
         }
+    
     }
 
     private void SearchBestPath(){

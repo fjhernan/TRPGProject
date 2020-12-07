@@ -74,6 +74,7 @@ public class CombatManager : MonoBehaviour
     }
 
     public void CombatBegin(string playerName, string enemyName, bool initiate){
+        GameObject.Find("GameManager").GetComponent<GameManager>().Pause();
         pComponent = GameObject.Find(playerName).GetComponent<Player>();
         eComponent = GameObject.Find(enemyName).GetComponent<Enemy>();
         player.SetStats(pComponent.GetHP(), pComponent.GetAtk(), pComponent.GetDef());
@@ -90,11 +91,13 @@ public class CombatManager : MonoBehaviour
                 Debug.Log("enemy hp " + enemy.GetHealth());
                 Debug.Log("dmg" + damage + " newHP" + newHp);
                 Debug.Log("Enemy has died");
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
                 GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
             }
             else
             {
                 Debug.Log("Enemy survives");
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
                 GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
             }
         }
@@ -108,11 +111,13 @@ public class CombatManager : MonoBehaviour
                 Debug.Log("player hp " + player.GetHealth());
                 Debug.Log("dmg" + damage + " newHP" + newHp);
                 Debug.Log("Player has died");
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
                 GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
             }
             else
             {
                 Debug.Log("Player survives");
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
                 GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
             }
         }

@@ -10,6 +10,7 @@ public class TurnManager : MonoBehaviour
     private PartyManager pComponent;
     private EnemyManager eComponent;
     private UIManager uComponent;
+    private bool gameOver = false;
 
     private void Start(){
         pComponent = Players.GetComponent<PartyManager>();
@@ -18,19 +19,28 @@ public class TurnManager : MonoBehaviour
     }
 
     public void UpdateCurrentTurn(bool value){
-        if(value == false){
-            //Enemy Turn Starts
-            Debug.Log("It is enemies turn");
-            uComponent.EnemyTurn();
-            pComponent.UpdateTurn(false);
-            eComponent.UpdateTurn(true);
+        if (gameOver == false)
+        {
+            if (value == false)
+            {
+                //Enemy Turn Starts
+                Debug.Log("It is enemies turn");
+                uComponent.EnemyTurn();
+                pComponent.UpdateTurn(false);
+                eComponent.UpdateTurn(true);
+            }
+            else if (value == true)
+            {
+                //Player Turn Starts
+                Debug.Log("It is players turn");
+                //uComponent.PlayerTurn();
+                pComponent.UpdateTurn(true);
+                eComponent.UpdateTurn(false);
+            }
         }
-        else if(value == true){
-            //Player Turn Starts
-            Debug.Log("It is players turn");
-            //uComponent.PlayerTurn();
-            pComponent.UpdateTurn(true);
-            eComponent.UpdateTurn(false);
-        }
+    }
+    
+    public void GameOver(){
+        gameOver = true;
     }
 }

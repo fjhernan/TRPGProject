@@ -7,7 +7,9 @@ public class PartyManager : MonoBehaviour
     public List<GameObject> PartyMembers;
     private int currentMember = 0;
     private bool currentTurn = true;
-
+    private bool gameOver = false;
+    private bool paused = false;
+    private bool playerPausedAtStart = false;
     public void GameStart(){
         for(int i = 0; i < PartyMembers.Count; i++){
             if (i != currentMember){
@@ -20,22 +22,33 @@ public class PartyManager : MonoBehaviour
     }
 
     private void Update(){
-        if (currentTurn == true) {
-            if (Input.GetKeyDown(KeyCode.Space)) {
-                if (currentMember < PartyMembers.Count){
-                    PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(false);
-                    currentMember++;
-                    GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
-                    //Debug.Log("Player currently" + currentMember);
-                    if (currentMember < PartyMembers.Count){
-                        PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
-                    }
-                    else{
-                        GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(false);
-                        currentMember = 0;
+        if (gameOver == false)
+        {
+            if (paused == false)
+            {
+                if (currentTurn == true)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space))
+                    {
+                        if (currentMember < PartyMembers.Count)
+                        {
+                            PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(false);
+                            currentMember++;
+                            GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
+                            //Debug.Log("Player currently" + currentMember);
+                            if (currentMember < PartyMembers.Count)
+                            {
+                                PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
+                            }
+                            else
+                            {
+                                GameObject.Find("TurnManager").GetComponent<TurnManager>().UpdateCurrentTurn(false);
+                                currentMember = 0;
+                            }
+                        }
+                        GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
                     }
                 }
-                GameObject.Find("GameManager").GetComponent<GameManager>().UpdateEveryonesTiles();
             }
         }
     }
@@ -45,7 +58,10 @@ public class PartyManager : MonoBehaviour
         currentTurn = value;
         if(value == true){
             currentMember = 0;
-            PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
+            if (paused == false)
+                PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
+            else
+                playerPausedAtStart = true;
         }
     }
 
@@ -62,6 +78,14 @@ public class PartyManager : MonoBehaviour
         //FinishedCharacterTurn();
     }
 
+    public void GameOver(){
+        gameOver = true;
+    }
+
+    public int GetPartySize(){
+        return PartyMembers.Count;
+    }
+
     public void UpdatePlayersOccupiedTiles(){
         for (int i = 0; i < PartyMembers.Count; i++){
             PartyMembers[i].GetComponent<Player>().UpdateOccupiedTiles();
@@ -74,4 +98,29 @@ public class PartyManager : MonoBehaviour
             PartyMembers[i].GetComponent<Player>().SetAllTiles(arr2d);
         }
     }
+
+    public void Pause()
+    {
+        paused = true;
+        if(currentTurn == true)
+        {
+            PartyMembers[currentMember].GetComponent<Player>().Pause();
+        }
+    }
+
+    public void UnPause()
+    {
+        paused = false;
+        if(currentTurn == true)
+        {
+            if (playerPausedAtStart == false)
+                PartyMembers[currentMember].GetComponent<Player>().UnPause();
+            else
+            {
+                PartyMembers[currentMember].GetComponent<Player>().SetControlStatus(true);
+                playerPausedAtStart = false; 
+            }
+        }
+    }
+
 }

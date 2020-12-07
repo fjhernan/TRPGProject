@@ -6,29 +6,47 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
-    public TextMeshProUGUI TurnDisplay, EnterKey, SpaceKey, ArrowKeys, TabKey, BackspaceKey, PlayerText;
-    public Image TurnBackground, EnterBackground, SpaceBackground, AKBackground, TabBackground, BackspaceBackground, PlayerBackground;
+    public TextMeshProUGUI TurnDisplay, EnterKey, SpaceKey,
+        ArrowKeys, TabKey, BackspaceKey, PlayerText, CombatText;
+    public Image TurnBackground, EnterBackground, SpaceBackground,
+        AKBackground, TabBackground, BackspaceBackground, PlayerBackground, CombatBackground;
+    public GameObject CombatButton;
     private bool hidden = false, combat = false, player_turn = true, player_hidden = false;
     private const string Turn = "Turn: ";
+    private bool gameOver = false;
 
     private void Start(){
         HideEnterKey();
         PlayerText.enabled = false;
         PlayerBackground.enabled = false;
+        CombatText.enabled = false;
+        CombatBackground.enabled = false;
+        CombatButton.SetActive(false);
     }
 
     private void Update(){
-        if (Input.GetKeyDown(KeyCode.Backspace)){
-            //Hide or Unhide Display
-            if (player_turn == true){
-                UpdateDisplay();
+        if (gameOver == false)
+        {
+            if (Input.GetKeyDown(KeyCode.Backspace))
+            {
+                //Hide or Unhide Display
+                if (player_turn == true)
+                {
+                    UpdateDisplay();
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                if (player_turn == true)
+                {
+                    ShowPlayerInfo();
+                }
             }
         }
-        if (Input.GetKeyDown(KeyCode.Tab)){
-            if(player_turn == true){
-                ShowPlayerInfo();
-            }
-        }
+    }
+
+    public void GameOver(){
+        gameOver = true;
     }
 
     private void UpdateDisplay(){
@@ -110,6 +128,27 @@ public class UIManager : MonoBehaviour
 
     public void PlayerInfo(string name, int hp, int atk, int def){
         PlayerText.text = "" + name + "\nHP: " + hp + "\nATK: " + atk + "\nDEF: " + def;
+    }
+
+    public void Combat(string eName, string pName, int dmg, bool initiate){
+        CombatText.enabled = true;
+        CombatBackground.enabled = true;
+        CombatButton.SetActive(true);
+        if(initiate == true){
+            //Player initiates combat
+            CombatText.text = pName + " Attacks!\n" + eName + " takes " + dmg + " damage!";
+        }
+        if(initiate == false){
+            //Enemy initiates combat
+            CombatText.text = eName + " Attacks!\n" + pName + " takes " + dmg + " damage!";
+        }
+    }
+
+    public void CombatMessage(){
+        CombatText.enabled = false;
+        CombatBackground.enabled = false;
+        CombatButton.SetActive(false);
+        GameObject.Find("GameManager").GetComponent<GameManager>().UnPause();
     }
 
     private void ShowPlayerInfo(){

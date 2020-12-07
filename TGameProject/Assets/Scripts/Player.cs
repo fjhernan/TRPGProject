@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
     private bool control = false;//Determines if the player can be controlled
     private const float offset_z = -0.5f;//Used when instantiating MoveTile
     private bool combatAllowed = false;
+    private bool paused = false;
 
     //Player now has a reference for movement
     public void SetAllTiles(GameObject[,] grid){
@@ -108,73 +109,97 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        if (control == true) {
-            if(CheckForAdjacentEnemy() != 0){
-                UIManager.GetComponent<UIManager>().ShowEnterKey();
-            }
-            else{
-                UIManager.GetComponent<UIManager>().HideEnterKey();
-                target.SetPosition(0,0);
-            }
-
-            if (target.GetPositionX() != 0 && target.GetPositionY() != 0){
-                if (Input.GetKeyDown(KeyCode.Return)){
-                    Debug.Log("Starting combat");
-                    if(combatAllowed == true)    
-                        CombatManager.GetComponent<CombatManager>().CombatBegin(gameObject.name, Occupied[target], true);
-
-                    //PartyManager.GetComponent<PartyManager>().FinishedCharacterTurn();
-                    UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
-                    UIManager.GetComponent<UIManager>().HideArrowKeys();
+        if (paused == false)
+        {
+            if (control == true)
+            {
+                if (CheckForAdjacentEnemy() != 0)
+                {
+                    UIManager.GetComponent<UIManager>().ShowEnterKey();
+                }
+                else
+                {
                     UIManager.GetComponent<UIManager>().HideEnterKey();
-                    control = false;
+                    target.SetPosition(0, 0);
                 }
-            }
 
-            if (Input.GetKeyDown(KeyCode.RightArrow)) {
-                int compare_x = (current.GetPositionX() - 1) - starting.GetPositionX();
-                int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
-                remainingMovement = movement - (Mathf.Abs(compare_x) + compare_y);
-                if(compare_x > 0){
-                    remainingMovement += compare_x;
+                if (target.GetPositionX() != 0 && target.GetPositionY() != 0)
+                {
+                    if (Input.GetKeyDown(KeyCode.Return))
+                    {
+                        Debug.Log("Starting combat");
+                        if (combatAllowed == true)
+                            CombatManager.GetComponent<CombatManager>().CombatBegin(gameObject.name, Occupied[target], true);
+
+                        //PartyManager.GetComponent<PartyManager>().FinishedCharacterTurn();
+                        UIManager.GetComponent<UIManager>().PlayerInfo(gameObject.name, hp, atk, def);
+                        UIManager.GetComponent<UIManager>().HideArrowKeys();
+                        UIManager.GetComponent<UIManager>().HideEnterKey();
+                        control = false;
+                        DisableHighlight();
+                    }
                 }
-                if (remainingMovement != 0) {
-                    if (current.GetPositionX() > min_size_x) {
-                        int x = current.GetPositionX() - 1;
-                        int y = current.GetPositionY();
-                        Position p = new Position();
-                        p.SetPosition(x, y);
 
-                        if (!(Occupied.ContainsKey(p))){
-                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                        }
-                        else if(Occupied.ContainsKey(p) == true){
-                            if(remainingMovement > 1){
-                                if (current.GetPositionX() > min_size_x + 1)
+                if (Input.GetKeyDown(KeyCode.RightArrow))
+                {
+                    int compare_x = (current.GetPositionX() - 1) - starting.GetPositionX();
+                    int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
+                    remainingMovement = movement - (Mathf.Abs(compare_x) + compare_y);
+                    if (compare_x > 0)
+                    {
+                        remainingMovement += compare_x;
+                    }
+                    if (remainingMovement != 0)
+                    {
+                        if (current.GetPositionX() > min_size_x)
+                        {
+                            int x = current.GetPositionX() - 1;
+                            int y = current.GetPositionY();
+                            Position p = new Position();
+                            p.SetPosition(x, y);
+
+                            if (!(Occupied.ContainsKey(p)))
+                            {
+                                Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                            }
+                            else if (Occupied.ContainsKey(p) == true)
+                            {
+                                if (remainingMovement > 1)
                                 {
-                                    x--;
-                                    p.SetPosition(x, y);
-                                    if (!(Occupied.ContainsKey(p))){
-                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                        transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                                    }
-                                    else if (Occupied.ContainsKey(p) == true){
-                                        if (remainingMovement > 2){
-                                            if (current.GetPositionX() > min_size_x + 2){
-                                                x--;
-                                                p.SetPosition(x, y);
-                                                if (!(Occupied.ContainsKey(p))){
-                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                                    transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                                                }
-                                                else if (Occupied.ContainsKey(p) == true){
-                                                    if (current.GetPositionX() > min_size_x + 3){
-                                                        x--;
-                                                        p.SetPosition(x, y);
-                                                        if (!(Occupied.ContainsKey(p))){
-                                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                    if (current.GetPositionX() > min_size_x + 1)
+                                    {
+                                        x--;
+                                        p.SetPosition(x, y);
+                                        if (!(Occupied.ContainsKey(p)))
+                                        {
+                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                        }
+                                        else if (Occupied.ContainsKey(p) == true)
+                                        {
+                                            if (remainingMovement > 2)
+                                            {
+                                                if (current.GetPositionX() > min_size_x + 2)
+                                                {
+                                                    x--;
+                                                    p.SetPosition(x, y);
+                                                    if (!(Occupied.ContainsKey(p)))
+                                                    {
+                                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                        transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                    }
+                                                    else if (Occupied.ContainsKey(p) == true)
+                                                    {
+                                                        if (current.GetPositionX() > min_size_x + 3)
+                                                        {
+                                                            x--;
+                                                            p.SetPosition(x, y);
+                                                            if (!(Occupied.ContainsKey(p)))
+                                                            {
+                                                                Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                                transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -186,47 +211,62 @@ public class Player : MonoBehaviour
                         }
                     }
                 }
-            }
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-                int compare_x = (current.GetPositionX() + 1) - starting.GetPositionX();
-                int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
-                remainingMovement = movement - (compare_x + compare_y);
-                if (remainingMovement != 0){
-                    if (current.GetPositionX() < size_x){
-                        int x = current.GetPositionX() + 1;
-                        int y = current.GetPositionY();
-                        Position p = new Position();
-                        p.SetPosition(x, y);
-                        
-                        if (!(Occupied.ContainsKey(p))) { 
-                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                        }
-                        else if(Occupied.ContainsKey(p) == true){
-                            if(remainingMovement > 1){
-                                if (current.GetPositionX() < size_x - 1) {
-                                    x++;
-                                    p.SetPosition(x, y);
-                                    if (!(Occupied.ContainsKey(p))){
-                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                        transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                                    }
-                                    else if (Occupied.ContainsKey(p) == true){
-                                        if (remainingMovement > 2){
-                                            if (current.GetPositionX() < size_x - 2){
-                                                x++;
-                                                p.SetPosition(x, y);
-                                                if (!(Occupied.ContainsKey(p))){
-                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                                    transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
-                                                }
-                                                else if (!(Occupied.ContainsKey(p))){
-                                                    if (current.GetPositionX() < size_x - 3){
-                                                        x++;
-                                                        p.SetPosition(x, y);
-                                                        if (!(Occupied.ContainsKey(p))){
-                                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                {
+                    int compare_x = (current.GetPositionX() + 1) - starting.GetPositionX();
+                    int compare_y = Mathf.Abs(current.GetPositionY() - starting.GetPositionY());
+                    remainingMovement = movement - (compare_x + compare_y);
+                    if (remainingMovement != 0)
+                    {
+                        if (current.GetPositionX() < size_x)
+                        {
+                            int x = current.GetPositionX() + 1;
+                            int y = current.GetPositionY();
+                            Position p = new Position();
+                            p.SetPosition(x, y);
+
+                            if (!(Occupied.ContainsKey(p)))
+                            {
+                                Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                            }
+                            else if (Occupied.ContainsKey(p) == true)
+                            {
+                                if (remainingMovement > 1)
+                                {
+                                    if (current.GetPositionX() < size_x - 1)
+                                    {
+                                        x++;
+                                        p.SetPosition(x, y);
+                                        if (!(Occupied.ContainsKey(p)))
+                                        {
+                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                            transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                        }
+                                        else if (Occupied.ContainsKey(p) == true)
+                                        {
+                                            if (remainingMovement > 2)
+                                            {
+                                                if (current.GetPositionX() < size_x - 2)
+                                                {
+                                                    x++;
+                                                    p.SetPosition(x, y);
+                                                    if (!(Occupied.ContainsKey(p)))
+                                                    {
+                                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                        transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                    }
+                                                    else if (!(Occupied.ContainsKey(p)))
+                                                    {
+                                                        if (current.GetPositionX() < size_x - 3)
+                                                        {
+                                                            x++;
+                                                            p.SetPosition(x, y);
+                                                            if (!(Occupied.ContainsKey(p)))
+                                                            {
+                                                                Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                                transform.position = new Vector3(temp.x, transform.position.y, transform.position.z);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -238,46 +278,59 @@ public class Player : MonoBehaviour
                         }
                     }
                 }
-            }
-            if (Input.GetKeyDown(KeyCode.UpArrow)){
-                int compare_x = Mathf.Abs(current.GetPositionX() - starting.GetPositionX());
-                int compare_y = Mathf.Abs((current.GetPositionY() - 1) - starting.GetPositionY());
-                remainingMovement = movement - (compare_x + compare_y);
-                
-                if (((current.GetPositionY() - 1) - starting.GetPositionY())  > 0){
-                    remainingMovement += compare_y;
-                }
+                if (Input.GetKeyDown(KeyCode.UpArrow))
+                {
+                    int compare_x = Mathf.Abs(current.GetPositionX() - starting.GetPositionX());
+                    int compare_y = Mathf.Abs((current.GetPositionY() - 1) - starting.GetPositionY());
+                    remainingMovement = movement - (compare_x + compare_y);
 
-                if (remainingMovement != 0){
-                    if (current.GetPositionY() > 0){
+                    if (((current.GetPositionY() - 1) - starting.GetPositionY()) > 0)
+                    {
+                        remainingMovement += compare_y;
+                    }
 
-                        int x = current.GetPositionX();
-                        int y = current.GetPositionY() - 1;
-                        Position p = new Position();
-                        p.SetPosition(x, y);
+                    if (remainingMovement != 0)
+                    {
+                        if (current.GetPositionY() > 0)
+                        {
 
-                        if (!(Occupied.ContainsKey(p))){
-                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                            transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                            
-                        }
-                        else if (Occupied.ContainsKey(p) == true){
-                            if (remainingMovement > 1){
-                                if (current.GetPositionY() > 1){
-                                    y--;
-                                    p.SetPosition(x, y);
-                                    if (!(Occupied.ContainsKey(p))){
-                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                        transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                                    }
-                                    else if(Occupied.ContainsKey(p) == true){
-                                        if (remainingMovement > 2) {
-                                            if (current.GetPositionY() > 2) {
-                                                y--;
-                                                p.SetPosition(x, y);
-                                                if (!(Occupied.ContainsKey(p))){
-                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                                    transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                            int x = current.GetPositionX();
+                            int y = current.GetPositionY() - 1;
+                            Position p = new Position();
+                            p.SetPosition(x, y);
+
+                            if (!(Occupied.ContainsKey(p)))
+                            {
+                                Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+
+                            }
+                            else if (Occupied.ContainsKey(p) == true)
+                            {
+                                if (remainingMovement > 1)
+                                {
+                                    if (current.GetPositionY() > 1)
+                                    {
+                                        y--;
+                                        p.SetPosition(x, y);
+                                        if (!(Occupied.ContainsKey(p)))
+                                        {
+                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                            transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                        }
+                                        else if (Occupied.ContainsKey(p) == true)
+                                        {
+                                            if (remainingMovement > 2)
+                                            {
+                                                if (current.GetPositionY() > 2)
+                                                {
+                                                    y--;
+                                                    p.SetPosition(x, y);
+                                                    if (!(Occupied.ContainsKey(p)))
+                                                    {
+                                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                        transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                                    }
                                                 }
                                             }
                                         }
@@ -287,39 +340,51 @@ public class Player : MonoBehaviour
                         }
                     }
                 }
-            }
-            if (Input.GetKeyDown(KeyCode.DownArrow)){
-                int compare_x = Mathf.Abs(current.GetPositionX() - starting.GetPositionX());
-                int compare_y = (current.GetPositionY() + 1) - starting.GetPositionY(); 
-                remainingMovement = movement - (compare_x + compare_y);
-                if (remainingMovement != 0){
-                    if (current.GetPositionY() < size_y) {
-                        int x = current.GetPositionX();
-                        int y = current.GetPositionY() + 1;
-                        Position p = new Position();
-                        p.SetPosition(x, y);
+                if (Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    int compare_x = Mathf.Abs(current.GetPositionX() - starting.GetPositionX());
+                    int compare_y = (current.GetPositionY() + 1) - starting.GetPositionY();
+                    remainingMovement = movement - (compare_x + compare_y);
+                    if (remainingMovement != 0)
+                    {
+                        if (current.GetPositionY() < size_y)
+                        {
+                            int x = current.GetPositionX();
+                            int y = current.GetPositionY() + 1;
+                            Position p = new Position();
+                            p.SetPosition(x, y);
 
-                        if (!(Occupied.ContainsKey(p))){
-                            Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 1].GetComponent<Grid>().transform.position;
-                            transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                        }
-                        else if (Occupied.ContainsKey(p) == true){
-                            if (remainingMovement > 1){
-                                if (current.GetPositionY() < (size_y - 1)){
-                                    y++;
-                                    p.SetPosition(x, y);
-                                    if (!(Occupied.ContainsKey(p))){
-                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                        transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
-                                    }
-                                    else if (Occupied.ContainsKey(p) == true){
-                                        if (remainingMovement > 2){
-                                            if (current.GetPositionY() < size_y - 2){
-                                                y++;
-                                                p.SetPosition(x, y);
-                                                if (!(Occupied.ContainsKey(p))){
-                                                    Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
-                                                    transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                            if (!(Occupied.ContainsKey(p)))
+                            {
+                                Vector3 temp = AllTiles[current.GetPositionX(), current.GetPositionY() + 1].GetComponent<Grid>().transform.position;
+                                transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                            }
+                            else if (Occupied.ContainsKey(p) == true)
+                            {
+                                if (remainingMovement > 1)
+                                {
+                                    if (current.GetPositionY() < (size_y - 1))
+                                    {
+                                        y++;
+                                        p.SetPosition(x, y);
+                                        if (!(Occupied.ContainsKey(p)))
+                                        {
+                                            Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                            transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                        }
+                                        else if (Occupied.ContainsKey(p) == true)
+                                        {
+                                            if (remainingMovement > 2)
+                                            {
+                                                if (current.GetPositionY() < size_y - 2)
+                                                {
+                                                    y++;
+                                                    p.SetPosition(x, y);
+                                                    if (!(Occupied.ContainsKey(p)))
+                                                    {
+                                                        Vector3 temp = AllTiles[x, y].GetComponent<Grid>().transform.position;
+                                                        transform.position = new Vector3(transform.position.x, temp.y, transform.position.z);
+                                                    }
                                                 }
                                             }
                                         }
@@ -339,39 +404,62 @@ public class Player : MonoBehaviour
         //Checks left
         temp.SetPosition(current.GetPositionX() + 1, current.GetPositionY());
         if (Occupied.ContainsKey(temp) == true){
-            if (Occupied[temp] == "Enemy1"){
-                target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
-                return 1;
+            for (int i = 0; i < AllSceneEnemies.Count; i++)
+            {
+                if (Occupied[temp] == AllSceneEnemies[i].name)
+                {
+                    target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
+                    return 1;
+                }
             }
         }
         //Checks right
         temp.SetPosition(current.GetPositionX() - 1, current.GetPositionY());
         if (Occupied.ContainsKey(temp) == true){
-            if (Occupied[temp] == "Enemy1"){
-                target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
-                return 1;
+            for (int i = 0; i < AllSceneEnemies.Count; i++)
+            {
+                if (Occupied[temp] == AllSceneEnemies[i].name)
+                {
+                    target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
+                    return 1;
+                }
             }
         }
         //Checks below
         temp.SetPosition(current.GetPositionX(), current.GetPositionY() + 1);
         if (Occupied.ContainsKey(temp) == true){
-            if (Occupied[temp] == "Enemy1"){
-                target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
-                return 1;
+            for (int i = 0; i < AllSceneEnemies.Count; i++)
+            {
+                if (Occupied[temp] == AllSceneEnemies[i].name)
+                {
+                    target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
+                    return 1;
+                }
             }
         }
         //Checks above
         temp.SetPosition(current.GetPositionX(), current.GetPositionY() - 1);
         if (Occupied.ContainsKey(temp) == true){
-            if (Occupied[temp] == "Enemy1"){
-                target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
-                return 1;
+            for (int i = 0; i < AllSceneEnemies.Count; i++)
+            {
+                if (Occupied[temp] == AllSceneEnemies[i].name)
+                {
+                    target.SetPosition(temp.GetPositionX(), temp.GetPositionY());
+                    return 1;
+                }
             }
         }
 
         return 0;
     }
 
+    public void Pause(){
+        paused = true;
+    }
+
+    public void UnPause() {
+        paused = false;
+    }
     //Updates the position of the player. Used when the player control is being switched.
     private void UpdatePosition(){
         starting.SetPosition(current.GetPositionX(), current.GetPositionY());
