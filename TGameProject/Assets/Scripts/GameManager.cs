@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -61,7 +62,9 @@ public class GameManager : MonoBehaviour
         EnemyManager.GetComponent<EnemyManager>().GameOver();
         //GameObject.Find("TurnManager").GetComponent<TurnManager>().GameOver();
         TurnManager.GetComponent<TurnManager>().GameOver();
+        UIManager.GetComponent<UIManager>().CombatMessage();
         UIManager.GetComponent<UIManager>().GameOver();
+        UIManager.GetComponent<UIManager>().LevelBeaten();
     }
 
     //Called whenever a player or an enemy finishes moving
@@ -80,5 +83,17 @@ public class GameManager : MonoBehaviour
     public void UnPause(){
         PartyManager.GetComponent<PartyManager>().UnPause();
         EnemyManager.GetComponent<EnemyManager>().UnPause();
+    }
+
+    public void Level1Beaten(){
+        SceneManager.LoadScene(2);
+    }
+
+    public void Level2Beaten(){
+        SceneManager.LoadScene(3);
+    }
+
+    public void GameBeaten(){
+        SceneManager.LoadScene(0);
     }
 }

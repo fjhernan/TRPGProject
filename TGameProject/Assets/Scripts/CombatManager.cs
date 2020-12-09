@@ -91,13 +91,13 @@ public class CombatManager : MonoBehaviour
                 Debug.Log("enemy hp " + enemy.GetHealth());
                 Debug.Log("dmg" + damage + " newHP" + newHp);
                 Debug.Log("Enemy has died");
-                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, newHp, initiate);
                 GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
             }
             else
             {
                 Debug.Log("Enemy survives");
-                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, newHp, initiate);
                 GameObject.Find(eComponent.gameObject.name).GetComponent<Enemy>().TookDamage(newHp);
             }
         }
@@ -111,13 +111,13 @@ public class CombatManager : MonoBehaviour
                 Debug.Log("player hp " + player.GetHealth());
                 Debug.Log("dmg" + damage + " newHP" + newHp);
                 Debug.Log("Player has died");
-                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, newHp, initiate);
                 GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
             }
             else
             {
                 Debug.Log("Player survives");
-                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, initiate);
+                GameObject.Find("UIManager").GetComponent<UIManager>().Combat(enemyName, playerName, damage, newHp, initiate);
                 GameObject.Find(pComponent.gameObject.name).GetComponent<Player>().TookDamage(newHp);
             }
         }

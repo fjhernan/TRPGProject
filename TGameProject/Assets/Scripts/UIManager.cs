@@ -7,10 +7,11 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI TurnDisplay, EnterKey, SpaceKey,
-        ArrowKeys, TabKey, BackspaceKey, PlayerText, CombatText;
+        ArrowKeys, TabKey, BackspaceKey, PlayerText, CombatText, LevelDoneText;
     public Image TurnBackground, EnterBackground, SpaceBackground,
-        AKBackground, TabBackground, BackspaceBackground, PlayerBackground, CombatBackground;
-    public GameObject CombatButton;
+        AKBackground, TabBackground, BackspaceBackground, PlayerBackground,
+        CombatBackground, LevelDoneBackground;
+    public GameObject CombatButton, LevelButton;
     private bool hidden = false, combat = false, player_turn = true, player_hidden = false;
     private const string Turn = "Turn: ";
     private bool gameOver = false;
@@ -22,23 +23,21 @@ public class UIManager : MonoBehaviour
         CombatText.enabled = false;
         CombatBackground.enabled = false;
         CombatButton.SetActive(false);
+        LevelDoneBackground.enabled = false;
+        LevelDoneText.enabled = false;
+        LevelButton.SetActive(false);
     }
 
     private void Update(){
-        if (gameOver == false)
-        {
-            if (Input.GetKeyDown(KeyCode.Backspace))
-            {
+        if (gameOver == false){
+            if (Input.GetKeyDown(KeyCode.Backspace)){
                 //Hide or Unhide Display
-                if (player_turn == true)
-                {
+                if (player_turn == true){
                     UpdateDisplay();
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                if (player_turn == true)
-                {
+            if (Input.GetKeyDown(KeyCode.Tab)){
+                if (player_turn == true){
                     ShowPlayerInfo();
                 }
             }
@@ -59,6 +58,7 @@ public class UIManager : MonoBehaviour
         if (combat == true){
             HideEnterKey();
         }
+        
 
         //Hide Display
         TurnDisplay.enabled = hidden;
@@ -130,17 +130,21 @@ public class UIManager : MonoBehaviour
         PlayerText.text = "" + name + "\nHP: " + hp + "\nATK: " + atk + "\nDEF: " + def;
     }
 
-    public void Combat(string eName, string pName, int dmg, bool initiate){
+    public void Combat(string eName, string pName, int dmg, int health, bool initiate){
         CombatText.enabled = true;
         CombatBackground.enabled = true;
         CombatButton.SetActive(true);
         if(initiate == true){
             //Player initiates combat
-            CombatText.text = pName + " Attacks!\n" + eName + " takes " + dmg + " damage!";
+            if (health <= 0)
+                health = 0;
+            CombatText.text = pName + " Attacks!\n" + eName + " takes " + dmg + " damage!\nEnemy has " + health + " hp left.";
         }
         if(initiate == false){
             //Enemy initiates combat
-            CombatText.text = eName + " Attacks!\n" + pName + " takes " + dmg + " damage!";
+            if (health <= 0)
+                health = 0;
+            CombatText.text = eName + " Attacks!\n" + pName + " takes " + dmg + " damage!\nPlayer has " + health + " hp left.";
         }
     }
 
@@ -149,6 +153,12 @@ public class UIManager : MonoBehaviour
         CombatBackground.enabled = false;
         CombatButton.SetActive(false);
         GameObject.Find("GameManager").GetComponent<GameManager>().UnPause();
+    }
+
+    public void LevelBeaten(){
+        LevelButton.SetActive(true);
+        LevelDoneBackground.enabled = true;
+        LevelDoneText.enabled = true;
     }
 
     private void ShowPlayerInfo(){
