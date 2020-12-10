@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
         //GameObject.Find("TurnManager").GetComponent<TurnManager>().GameOver();
         TurnManager.GetComponent<TurnManager>().GameOver();
         UIManager.GetComponent<UIManager>().GameOver();
+        UIManager.GetComponent<UIManager>().CombatMessage();
+        UIManager.GetComponent<UIManager>().GameOverScreen();
     }
 
     public void AllEnemiesDead(){
@@ -95,5 +97,9 @@ public class GameManager : MonoBehaviour
 
     public void GameBeaten(){
         SceneManager.LoadScene(0);
+    }
+
+    public void GameOver(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

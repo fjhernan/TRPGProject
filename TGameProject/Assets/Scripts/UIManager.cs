@@ -7,11 +7,12 @@ using TMPro;
 public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI TurnDisplay, EnterKey, SpaceKey,
-        ArrowKeys, TabKey, BackspaceKey, PlayerText, CombatText, LevelDoneText;
+        ArrowKeys, TabKey, BackspaceKey, PlayerText, CombatText,
+        LevelDoneText, GameOverText;
     public Image TurnBackground, EnterBackground, SpaceBackground,
         AKBackground, TabBackground, BackspaceBackground, PlayerBackground,
-        CombatBackground, LevelDoneBackground;
-    public GameObject CombatButton, LevelButton;
+        CombatBackground, LevelDoneBackground, GameOverBackground;
+    public GameObject CombatButton, LevelButton, GameOverButton;
     private bool hidden = false, combat = false, player_turn = true, player_hidden = false;
     private const string Turn = "Turn: ";
     private bool gameOver = false;
@@ -26,6 +27,9 @@ public class UIManager : MonoBehaviour
         LevelDoneBackground.enabled = false;
         LevelDoneText.enabled = false;
         LevelButton.SetActive(false);
+        GameOverText.enabled = false;
+        GameOverBackground.enabled = false;
+        GameOverButton.SetActive(false);
     }
 
     private void Update(){
@@ -171,5 +175,11 @@ public class UIManager : MonoBehaviour
 
         PlayerBackground.enabled = player_hidden;
         PlayerText.enabled = player_hidden;
+    }
+
+    public void GameOverScreen(){
+        GameOverButton.SetActive(true);
+        GameOverBackground.enabled = true;
+        GameOverText.enabled = true;
     }
 }
